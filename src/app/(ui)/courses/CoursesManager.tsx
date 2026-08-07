@@ -8,6 +8,8 @@ import { createClient } from '@/lib/supabase/client';
 type Course = {
   id: string;
   name: string;
+  year: number;
+  semester: number;
   created_at: string;
 };
 
@@ -27,6 +29,11 @@ export default function CoursesManager({
 
   const [courses, setCourses] = useState<Course[]>(initialCourses);
 
+  // Filtros
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [selectedSemester, setSelectedSemester] = useState<string>('all');
+
   // Modais de Estado
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
@@ -34,35 +41,37 @@ export default function CoursesManager({
 
   // Estado do formulário
   const [name, setName] = useState('');
+  const [year, setYear] = useState<number>(1);
+  const [semester, setSemester] = useState<number>(1);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Abrir Modal para Criar
   const handleOpenCreateModal = () => {
     setEditingCourse(null);
     setName('');
+    setYear(1);
+    setSemester(1);
     setErrorMsg('');
     setIsFormModalOpen(true);
   };
 
-  // Abrir Modal para Editar
   const handleOpenEditModal = (course: Course, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setEditingCourse(course);
     setName(course.name);
+    setYear(course.year);
+    setSemester(course.semester);
     setErrorMsg('');
     setIsFormModalOpen(true);
   };
 
-  // Abrir Modal para Confirmar Eliminação
   const handleOpenDeleteModal = (course: Course, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setDeletingCourse(course);
   };
 
-  // Guardar (Create ou Update)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -71,7 +80,7 @@ export default function CoursesManager({
     if (editingCourse) {
       const { data, error } = await supabase
         .from('courses')
-        .update({ name })
+        .update({ name, year: Number(year), semester: Number(semester) })
         .eq('id', editingCourse.id)
         .select()
         .single();
@@ -88,7 +97,7 @@ export default function CoursesManager({
     } else {
       const { data, error } = await supabase
         .from('courses')
-        .insert([{ name }])
+        .insert([{ name, year: Number(year), semester: Number(semester) }])
         .select()
         .single();
 
@@ -104,7 +113,6 @@ export default function CoursesManager({
     setLoading(false);
   };
 
-  // DELETE
   const handleConfirmDelete = async () => {
     if (!deletingCourse) return;
 
@@ -124,10 +132,22 @@ export default function CoursesManager({
     setLoading(false);
   };
 
+  const filteredCourses = courses.filter((course) => {
+    const matchesName = course.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesYear =
+      selectedYear === 'all' || course.year.toString() === selectedYear;
+    const matchesSemester =
+      selectedSemester === 'all' || course.semester.toString() === selectedSemester;
+
+    return matchesName && matchesYear && matchesSemester;
+  });
+
   return (
     <div className="max-w-5xl mx-auto py-12 px-4">
       {/* Cabeçalho */}
-      <div className="flex flex-col items-center text-center gap-4 mb-10">
+      <div className="flex flex-col items-center text-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-black dark:text-white">
             Unidades Curriculares
@@ -147,6 +167,38 @@ export default function CoursesManager({
         )}
       </div>
 
+      {/* Barra de Filtros */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-8">
+        <input
+          type="text"
+          placeholder="Pesquisar por nome..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="h-10 flex-1 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-transparent px-3 text-sm text-black dark:text-white outline-none focus:border-black dark:focus:border-white"
+        />
+
+        <select
+          value={selectedYear}
+          onChange={(e) => setSelectedYear(e.target.value)}
+          className="h-10 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-transparent px-3 text-sm text-black dark:text-white outline-none focus:border-black dark:focus:border-white"
+        >
+          <option value="all" className="bg-white dark:bg-zinc-900">Todos os Anos</option>
+          <option value="1" className="bg-white dark:bg-zinc-900">1º Ano</option>
+          <option value="2" className="bg-white dark:bg-zinc-900">2º Ano</option>
+          <option value="3" className="bg-white dark:bg-zinc-900">3º Ano</option>
+        </select>
+
+        <select
+          value={selectedSemester}
+          onChange={(e) => setSelectedSemester(e.target.value)}
+          className="h-10 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-transparent px-3 text-sm text-black dark:text-white outline-none focus:border-black dark:focus:border-white"
+        >
+          <option value="all" className="bg-white dark:bg-zinc-900">Todos os Semestres</option>
+          <option value="1" className="bg-white dark:bg-zinc-900">1º Semestre</option>
+          <option value="2" className="bg-white dark:bg-zinc-900">2º Semestre</option>
+        </select>
+      </div>
+
       {fetchError && (
         <p className="text-sm text-red-500 text-center mb-6">
           Erro: {fetchError}
@@ -154,27 +206,34 @@ export default function CoursesManager({
       )}
 
       {/* Lista de Unidades Curriculares */}
-      {courses.length === 0 ? (
+      {filteredCourses.length === 0 ? (
         <div className="text-center py-16 border border-dashed border-zinc-300 dark:border-zinc-800 rounded-2xl">
           <p className="text-sm text-zinc-500">
-            Ainda não há unidades curriculares disponíveis.
+            Ainda não há unidades curriculares correspondentes.
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {courses.map((course) => (
+          {filteredCourses.map((course) => (
             <Link
               key={course.id}
               href={`/courses/${course.id}`}
               className="group p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 hover:border-black dark:hover:border-zinc-700 transition-all flex flex-col justify-between gap-6 cursor-pointer"
             >
-              <div className="flex-1 flex items-center justify-center py-2">
-                <h2 className="font-semibold text-lg text-black dark:text-white text-center group-hover:underline">
+              <div className="flex flex-col items-center text-center gap-2 py-2 flex-1">
+                <div className="flex gap-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300">
+                    {course.year}º Ano
+                  </span>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-zinc-100 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300">
+                    {course.semester}º Semestre
+                  </span>
+                </div>
+                <h2 className="font-semibold text-lg text-black dark:text-white group-hover:underline">
                   {course.name}
                 </h2>
               </div>
 
-              {/* Ações do Admin Sempre Visíveis e Elegantes */}
               {isAdmin && (
                 <div className="flex items-center justify-center gap-2 pt-3 border-t border-zinc-100 dark:border-zinc-900/80">
                   <button
@@ -196,11 +255,11 @@ export default function CoursesManager({
         </div>
       )}
 
-      {/* Modal 1: Criar / Editar */}
+      {/* Modal Criar / Editar */}
       {isFormModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-2xl text-center">
-            <h2 className="text-lg font-semibold text-black dark:text-white mb-4">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-2xl">
+            <h2 className="text-lg font-semibold text-black dark:text-white mb-4 text-center">
               {editingCourse
                 ? 'Editar Unidade Curricular'
                 : 'Criar Nova Unidade Curricular'}
@@ -225,6 +284,37 @@ export default function CoursesManager({
                   placeholder="Ex: Arquitetura de Computadores"
                   className="h-10 w-full rounded-lg border border-zinc-300 dark:border-zinc-800 bg-transparent px-3 text-sm text-black dark:text-white outline-none focus:border-black dark:focus:border-white"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-1.5 text-left">
+                  <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Ano
+                  </label>
+                  <select
+                    value={year}
+                    onChange={(e) => setYear(Number(e.target.value))}
+                    className="h-10 w-full rounded-lg border border-zinc-300 dark:border-zinc-800 bg-transparent px-3 text-sm text-black dark:text-white outline-none focus:border-black dark:focus:border-white"
+                  >
+                    <option value={1} className="bg-white dark:bg-zinc-900">1º Ano</option>
+                    <option value={2} className="bg-white dark:bg-zinc-900">2º Ano</option>
+                    <option value={3} className="bg-white dark:bg-zinc-900">3º Ano</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5 text-left">
+                  <label className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                    Semestre
+                  </label>
+                  <select
+                    value={semester}
+                    onChange={(e) => setSemester(Number(e.target.value))}
+                    className="h-10 w-full rounded-lg border border-zinc-300 dark:border-zinc-800 bg-transparent px-3 text-sm text-black dark:text-white outline-none focus:border-black dark:focus:border-white"
+                  >
+                    <option value={1} className="bg-white dark:bg-zinc-900">1º Semestre</option>
+                    <option value={2} className="bg-white dark:bg-zinc-900">2º Semestre</option>
+                  </select>
+                </div>
               </div>
 
               <div className="flex justify-end gap-2 mt-2">
@@ -252,7 +342,7 @@ export default function CoursesManager({
         </div>
       )}
 
-      {/* Modal 2: Confirmação de Eliminação Personalizada */}
+      {/* Modal Confirmação de Eliminação */}
       {deletingCourse && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-2xl text-center">
@@ -277,11 +367,7 @@ export default function CoursesManager({
             </h3>
 
             <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-6">
-              Tens a certeza que pretendes eliminar{' '}
-              <span className="font-semibold text-black dark:text-white">
-                &quot;{deletingCourse.name}&quot;
-              </span>
-              ? Esta ação não pode ser desfeita.
+              Tens a certeza que pretendes eliminar <span className="font-semibold text-black dark:text-white">&quot;{deletingCourse.name}&quot;</span>? Esta ação não pode ser desfeita.
             </p>
 
             <div className="flex justify-center gap-3">

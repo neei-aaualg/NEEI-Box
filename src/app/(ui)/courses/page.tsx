@@ -23,8 +23,8 @@ export default async function CoursesPage() {
 
   const { data: courses, error } = await supabase
     .from('courses')
-    .select('id, name, created_at')
-    .order('created_at', { ascending: false });
+    .select('id, name, year, semester, created_at')
+    .order('name', { ascending: true });
 
   return (
     <CoursesManager
