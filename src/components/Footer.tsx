@@ -7,8 +7,9 @@ interface FooterProps {
 export default function Footer({ user }: FooterProps) {
   const links = [
     { href: '/', label: 'Início' },
-    ...(user ? [{ href: '/courses', label: 'Unidades Curriculares' }] : []),
-    { href: '/login', label: 'Entrar' },
+    ...(user
+      ? [{ href: '/courses', label: 'Unidades Curriculares' }]
+      : [{ href: '/login', label: 'Entrar' }]),
   ];
 
   return (

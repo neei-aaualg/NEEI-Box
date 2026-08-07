@@ -181,8 +181,8 @@ export default function Home() {
           className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(11_51_69/0.06)_1px,transparent_0)] [background-size:28px_28px] dark:bg-[radial-gradient(circle_at_1px_1px,rgb(151_214_238/0.05)_1px,transparent_0)]"
         />
 
-        <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 pb-16 pt-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:pb-24 lg:pt-28">
-          <div className="animate-fade-up">
+        <div className="relative mx-auto grid min-w-0 max-w-6xl items-center gap-14 px-4 pb-16 pt-20 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:pb-24 lg:pt-28">
+          <div className="min-w-0 animate-fade-up">
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-3.5 py-1.5 text-xs font-semibold text-brand-800 dark:border-brand-900 dark:bg-brand-950 dark:text-brand-200">
               <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
               Plataforma oficial do NEEI · Universidade do Algarve
@@ -275,7 +275,7 @@ export default function Home() {
           {/* Mockup */}
           <div
             aria-hidden="true"
-            className="animate-fade-up [animation-delay:150ms]"
+            className="min-w-0 animate-fade-up [animation-delay:150ms]"
           >
             <div className="relative">
               <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-br from-brand-400/20 to-brand-600/10 blur-2xl" />
@@ -285,7 +285,7 @@ export default function Home() {
                   <span className="h-3 w-3 rounded-full bg-red-400/80" />
                   <span className="h-3 w-3 rounded-full bg-amber-400/80" />
                   <span className="h-3 w-3 rounded-full bg-emerald-400/80" />
-                  <span className="ml-3 flex-1 truncate rounded-full bg-zinc-100 px-3 py-1 text-[10px] text-zinc-400 dark:bg-white/5 dark:text-zinc-500">
+                  <span className="ml-3 min-w-0 flex-1 truncate rounded-full bg-zinc-100 px-3 py-1 text-[10px] text-zinc-400 dark:bg-white/5 dark:text-zinc-500">
                     neeibox.pt/cursos
                   </span>
                 </div>
