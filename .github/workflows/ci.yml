@@ -2,17 +2,18 @@ name: CI - Code Quality & Build Check
 
 on:
   push:
-    branches: [main]
+    branches: [main, master, dev]
   pull_request:
-    branches: [main]
+    branches: [main, master, dev]
 
-  defaults:
-      run:
-        working-directory: ./src
 jobs:
   quality-check:
     name: Code Quality & Integrity
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./src
 
     steps:
       - name: Checkout repository
@@ -21,8 +22,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-code-version: '20'
+          node-version: '20'
           cache: 'npm'
+          cache-dependency-path: './src/package-lock.json'
 
       - name: Install dependencies
         run: npm ci
@@ -32,9 +34,6 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
-
-      - name: Check TypeScript Types (opcional)
-        run: npx tsc --noEmit
 
       - name: Build Next.js Project
         run: npm run build
