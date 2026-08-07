@@ -58,7 +58,7 @@ export default async function RootLayout({
           isAdmin={isAdmin}
         />
         <main className="flex-1">{children}</main>
-        <Footer />
+        <Footer user={user ? { email: user.email ?? '' } : null} />
       </body>
     </html>
   );

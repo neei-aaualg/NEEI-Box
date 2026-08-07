@@ -1,9 +1,13 @@
 import Link from 'next/link';
 
-export default function Footer() {
+interface FooterProps {
+  user: { email: string } | null;
+}
+
+export default function Footer({ user }: FooterProps) {
   const links = [
     { href: '/', label: 'Início' },
-    { href: '/courses', label: 'Unidades Curriculares' },
+    ...(user ? [{ href: '/courses', label: 'Unidades Curriculares' }] : []),
     { href: '/login', label: 'Entrar' },
   ];
 

@@ -18,7 +18,7 @@ export default function Header({ user, isAdmin }: HeaderProps) {
 
   const navItems = [
     { href: '/', label: 'Início' },
-    { href: '/courses', label: 'Unidades Curriculares' },
+    ...(user ? [{ href: '/courses', label: 'Unidades Curriculares' }] : []),
     ...(isAdmin ? [{ href: '/admin', label: 'Administração' }] : []),
   ];
 
