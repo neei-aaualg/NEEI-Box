@@ -1,6 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import MaterialsManager from './MaterialsManager';
+import type { Material } from '@/lib/types';
 
 interface PageProps {
   params: Promise<{
@@ -8,11 +10,14 @@ interface PageProps {
   }>;
 }
 
+export const metadata: Metadata = {
+  title: 'Materiais',
+};
+
 export default async function CourseMaterialsPage({ params }: PageProps) {
   const { id } = await params;
   const supabase = await createClient();
 
-  // 1. Validar Sessão
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -21,7 +26,6 @@ export default async function CourseMaterialsPage({ params }: PageProps) {
     redirect('/login');
   }
 
-  // 2. Verificar Role
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
@@ -30,7 +34,6 @@ export default async function CourseMaterialsPage({ params }: PageProps) {
 
   const isAdmin = profile?.role === 'ADMIN';
 
-  // 3. Obter Detalhes da UC
   const { data: course, error: courseError } = await supabase
     .from('courses')
     .select('id, name')
@@ -41,7 +44,6 @@ export default async function CourseMaterialsPage({ params }: PageProps) {
     notFound();
   }
 
-  // 4. Obter Materiais
   const { data: materials, error: materialsError } = await supabase
     .from('materials')
     .select('*')
@@ -51,7 +53,7 @@ export default async function CourseMaterialsPage({ params }: PageProps) {
   return (
     <MaterialsManager
       course={course}
-      initialMaterials={materials || []}
+      initialMaterials={(materials as Material[]) || []}
       isAdmin={isAdmin}
       fetchError={materialsError?.message}
     />
