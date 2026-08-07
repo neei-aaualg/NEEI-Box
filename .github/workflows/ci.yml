@@ -1,0 +1,39 @@
+name: CI - Code Quality & Build Check
+
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+    branches: [main, master, dev]
+
+jobs:
+  quality-check:
+    name: Code Quality & Integrity
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./src
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './src/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check Prettier Formatting
+        run: npm run format:check
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Build Next.js Project
+        run: npm run build
