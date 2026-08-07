@@ -2,6 +2,13 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+
+const perks = [
+  'Acesso a apontamentos, exames e apresentações',
+  'Materiais organizados por unidade curricular',
+  'Conteúdo revisto e aprovado pelo NEEI',
+];
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -56,106 +63,193 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black px-4 min-h-screen">
-      <main className="flex flex-1 w-full max-w-md flex-col items-center justify-center py-16 px-8 bg-white dark:bg-black rounded-2xl sm:shadow-sm sm:border sm:border-zinc-200 dark:sm:border-zinc-800 my-auto">
-        <div className="mb-8">
-          <Image
-            src="/next.svg"
-            alt="Logótipo NEEI"
-            className="dark:invert h-5 w-[100px]"
-            width={100}
-            height={20}
-            suppressHydrationWarning
-          />
+    <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-2">
+      {/* Painel de marca */}
+      <div className="relative hidden overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 p-12 lg:flex lg:flex-col lg:justify-between">
+        <div
+          aria-hidden="true"
+          className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-brand-500/20 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute -bottom-32 -right-16 h-96 w-96 rounded-full bg-brand-400/20 blur-3xl"
+        />
+
+        <Link href="/" className="relative flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl ring-1 ring-white/20">
+            <Image
+              src="/neei.svg"
+              alt=""
+              width={44}
+              height={44}
+              className="h-full w-full object-cover"
+            />
+          </span>
+          <span className="text-lg font-bold tracking-tight text-white">
+            NEEI-Box
+          </span>
+        </Link>
+
+        <div className="relative max-w-md">
+          <h2 className="text-3xl font-bold leading-tight tracking-tight text-white">
+            O teu curso começa aqui —{' '}
+            <span className="text-brand-300">com ajuda de quem já passou.</span>
+          </h2>
+          <p className="mt-4 text-sm leading-relaxed text-brand-100/90">
+            Entra com o teu email institucional e explora centenas de materiais
+            partilhados pela comunidade de Engenharia Informática da UAlg.
+          </p>
+
+          <ul className="mt-8 space-y-3">
+            {perks.map((perk) => (
+              <li
+                key={perk}
+                className="flex items-center gap-3 text-sm text-brand-50/90"
+              >
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500/30 text-brand-200">
+                  <svg
+                    aria-hidden="true"
+                    className="h-3.5 w-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4.5 12.75l6 6 9-13.5"
+                    />
+                  </svg>
+                </span>
+                {perk}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {!submitted ? (
-          <>
-            <div className="flex flex-col items-center gap-2 text-center mb-8">
-              <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-zinc-50">
-                Bem-vindo de volta
-              </h1>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                Insere o teu email institucional para iniciar sessão.
-              </p>
-            </div>
+        <p className="relative text-xs text-brand-200/70">
+          © {new Date().getFullYear()} Núcleo de Estudantes de Engenharia
+          Informática — Universidade do Algarve
+        </p>
+      </div>
 
-            <form
-              onSubmit={handleSubmit}
-              className="flex flex-col w-full gap-4"
-            >
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="email"
-                  className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
-                >
-                  Endereço de email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  placeholder="a12345@ualg.pt"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="h-11 w-full rounded-full border border-black/[.08] dark:border-white/[.145] bg-transparent px-4 text-sm text-black dark:text-zinc-50 outline-none transition-colors placeholder:text-zinc-400 focus:border-black dark:focus:border-white"
-                />
+      {/* Formulário */}
+      <div className="flex items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-night-950">
+        <div className="w-full max-w-md">
+          <div className="mb-8 flex items-center gap-3 lg:hidden">
+            <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl ring-1 ring-zinc-900/10 dark:ring-white/10">
+              <Image
+                src="/neei.svg"
+                alt=""
+                width={40}
+                height={40}
+                className="h-full w-full object-cover"
+              />
+            </span>
+            <span className="text-base font-bold tracking-tight text-zinc-900 dark:text-white">
+              NEEI-Box
+            </span>
+          </div>
+
+          {!submitted ? (
+            <>
+              <div className="mb-8">
+                <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
+                  Bem-vindo de volta
+                </h1>
+                <p className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">
+                  Insere o teu email institucional para iniciar sessão.
+                </p>
               </div>
 
-              {errorMsg && (
-                <div className="text-xs text-red-500 bg-red-50 dark:bg-red-950/30 p-3 rounded-lg border border-red-200 dark:border-red-900/50">
-                  {errorMsg}
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="email"
+                    className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
+                  >
+                    Endereço de email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    placeholder="a12345@ualg.pt"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-11 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm text-zinc-900 outline-none transition-shadow placeholder:text-zinc-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-night-900 dark:text-white dark:focus:border-brand-400"
+                  />
                 </div>
-              )}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex h-11 w-full items-center justify-center rounded-full bg-black dark:bg-zinc-50 text-white dark:text-black font-medium text-sm transition-colors hover:bg-zinc-800 dark:hover:bg-zinc-200 mt-2 disabled:opacity-50"
-              >
-                {loading ? 'A enviar...' : 'Continuar com email'}
-              </button>
-            </form>
-          </>
-        ) : (
-          <div className="flex flex-col items-center gap-4 text-center py-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-black dark:text-zinc-50">
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                {errorMsg && (
+                  <div
+                    role="alert"
+                    className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
+                  >
+                    {errorMsg}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-1 flex h-11 w-full items-center justify-center rounded-xl bg-brand-900 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-800 disabled:opacity-60 dark:bg-brand-500 dark:text-night-950 dark:hover:bg-brand-400"
+                >
+                  {loading ? 'A enviar...' : 'Enviar link de acesso'}
+                </button>
+              </form>
+
+              <p className="mt-6 text-center text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+                Só aceitamos emails institucionais da{' '}
+                <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                  Universidade do Algarve
+                </span>
+                . Não tens conta? Cria-a automaticamente com o mesmo email.
+              </p>
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-4 py-6 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
+                <svg
+                  aria-hidden="true"
+                  className="h-7 w-7"
+                  fill="none"
+                  stroke="currentColor"
                   strokeWidth="2"
-                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 002-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+                Verifica o teu email!
+              </h2>
+              <p className="max-w-xs text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                Enviámos um link mágico de acesso para{' '}
+                <span className="font-semibold text-zinc-900 dark:text-white">
+                  {email}
+                </span>
+                .
+              </p>
+              <button
+                onClick={() => {
+                  setSubmitted(false);
+                  setErrorMsg('');
+                }}
+                className="mt-2 text-xs font-medium text-brand-700 underline underline-offset-2 hover:text-brand-600 dark:text-brand-300 dark:hover:text-brand-200"
+              >
+                Utilizar outro email
+              </button>
             </div>
-            <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
-              Verifica o teu email!
-            </h2>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-xs">
-              Enviámos um link mágico de acesso para{' '}
-              <span className="font-medium text-black dark:text-zinc-50">
-                {email}
-              </span>
-              .
-            </p>
-            <button
-              onClick={() => {
-                setSubmitted(false);
-                setErrorMsg('');
-              }}
-              className="text-xs font-medium text-zinc-500 hover:text-black dark:hover:text-zinc-50 underline mt-2"
-            >
-              Utilizar outro email
-            </button>
-          </div>
-        )}
-      </main>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

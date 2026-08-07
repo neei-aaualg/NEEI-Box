@@ -1,1 +1,88 @@
 @import 'tailwindcss';
+
+@theme {
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:
+    var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
+
+  --color-brand-50: #f0f9fd;
+  --color-brand-100: #ddf0f9;
+  --color-brand-200: #c2e6f5;
+  --color-brand-300: #97d6ee;
+  --color-brand-400: #64bde2;
+  --color-brand-500: #3fa2d2;
+  --color-brand-600: #2c86b8;
+  --color-brand-700: #276b94;
+  --color-brand-800: #255979;
+  --color-brand-900: #135a79;
+  --color-brand-950: #0b3345;
+
+  --color-night-950: #040b11;
+  --color-night-900: #071018;
+  --color-night-800: #0b1a24;
+  --color-night-700: #122630;
+
+  --shadow-card:
+    0 1px 2px rgb(11 51 69 / 0.04), 0 8px 24px -8px rgb(11 51 69 / 0.12);
+  --shadow-card-hover:
+    0 2px 4px rgb(11 51 69 / 0.05), 0 16px 40px -12px rgb(11 51 69 / 0.22);
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-fade-up: fade-up 0.6s ease-out both;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+::selection {
+  background-color: var(--color-brand-200);
+  color: var(--color-brand-950);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-white);
+  color: var(--color-zinc-900);
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--color-night-950);
+    color: var(--color-zinc-50);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
