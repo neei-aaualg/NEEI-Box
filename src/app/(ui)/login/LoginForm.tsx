@@ -70,10 +70,8 @@ export default function LoginForm() {
     e.preventDefault();
     setErrorMsg('');
 
-    if (!/^\d{6}$/.test(token.trim())) {
-      setErrorMsg(
-        'O código tem 6 dígitos. Verifica o email e tenta novamente.'
-      );
+    if (!/^\d{6,10}$/.test(token.trim())) {
+      setErrorMsg('O código não é válido. Verifica o email e tenta novamente.');
       return;
     }
 
@@ -267,7 +265,7 @@ export default function LoginForm() {
                   Verifica o teu email
                 </h1>
                 <p className="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                  Enviámos um código de 6 dígitos para{' '}
+                  Enviámos um código de acesso para{' '}
                   <span className="font-semibold text-zinc-900 dark:text-white">
                     {email}
                   </span>
@@ -289,11 +287,11 @@ export default function LoginForm() {
                     required
                     inputMode="numeric"
                     autoComplete="one-time-code"
-                    maxLength={6}
-                    placeholder="000000"
+                    maxLength={10}
+                    placeholder="00000000"
                     value={token}
                     onChange={(e) =>
-                      setToken(e.target.value.replace(/\D/g, '').slice(0, 6))
+                      setToken(e.target.value.replace(/\D/g, '').slice(0, 10))
                     }
                     className="h-11 w-full rounded-xl border border-zinc-300 bg-white px-4 text-center text-lg font-semibold tracking-[0.35em] text-zinc-900 outline-none transition-shadow placeholder:text-zinc-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-night-900 dark:text-white dark:placeholder:text-zinc-600 dark:focus:border-brand-400"
                   />

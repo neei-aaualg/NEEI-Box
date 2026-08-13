@@ -17,7 +17,7 @@ e semestre, com revisão e aprovação pela equipa do NEEI.
 
 | Área | Descrição |
 | --- | --- |
-| **Login por email institucional** | Autenticação com código OTP de 6 dígitos (sem palavras-passe), restrita a emails `aXXXXX@ualg.pt`. |
+| **Login por email institucional** | Autenticação com código OTP (sem palavras-passe), restrita a emails `aXXXXX@ualg.pt`. |
 | **Unidades Curriculares** | Catálogo de UCs organizado por ano e semestre, com pesquisa e filtros. |
 | **Partilha de materiais** | Upload de ficheiros (PDF, DOCX, PPTX, XLSX, ZIP, imagens…) com título e descrição. |
 | **Revisão por administradores** | Cada material passa por um fluxo de aprovação/rejeição antes de ficar público. |
@@ -42,7 +42,7 @@ e semestre, com revisão e aprovação pela equipa do NEEI.
                                 └──────────────────┘
 ```
 
-- **Autenticação** — Supabase Auth com OTP por email (código de 6 dígitos).
+- **Autenticação** — Supabase Auth com OTP por email.
   O proxy (`src/proxy.ts`) protege as rotas privadas e renova a sessão.
 - **Armazenamento de ficheiros** — Os ficheiros são carregados para o bucket
   `materials` do Supabase Storage, em `<user_id>/<uuid>-<ficheiro>`. A base de
@@ -91,7 +91,9 @@ Abre [http://localhost:3000](http://localhost:3000).
 2. Configura **Authentication → Email → Enable Email signup** e, em
    **Authentication → Emails → Templates → Magic Link**, substitui
    `{{ .ConfirmationURL }}` por `{{ .Token }}` — é isto que faz o Supabase
-   enviar um código de 6 dígitos em vez de um *magic link*.
+   enviar o código em vez de um *magic link* (o comprimento do código é
+   configurável em **Authentication → Sign In / Providers → Email → Email OTP
+   length**; o cliente aceita 6–10 dígitos).
 3. Configura **Storage** (ficheiros dos materiais):
    - Cria o bucket `materials` com **public access** (Storage → New bucket);
    - Executa no **SQL Editor**:
@@ -131,7 +133,7 @@ src/
 ├── app/
 │   ├── (ui)/               # páginas com layout partilhado
 │   │   ├── page.tsx        # landing page
-│   │   ├── login/          # entrada com código OTP (6 dígitos)
+│   │   ├── login/          # entrada com código OTP
 │   │   ├── courses/        # catálogo de UCs + materiais
 │   │   └── admin/          # painel de administração
 │   └── api/
@@ -150,7 +152,7 @@ src/
 
 ## Pontos fortes do projeto
 
-- **Sem palavras-passe** — o código OTP (6 dígitos) enviado para o email
+- **Sem palavras-passe** — o código OTP enviado para o email
   institucional é simples, seguro e garante que só estudantes da UAlg entram.
 - **Tudo dentro do Supabase** — autenticação, base de dados e ficheiros no mesmo
   projeto: menos serviços externos, uma única fonte de verdade.
@@ -172,7 +174,7 @@ src/
 - **Supabase Storage na prática** — buckets públicos vs. privados, caminhos
   com prefixo do utilizador, políticas RLS no `storage.objects` e URLs públicas
   para pré-visualizações.
-- **Autenticação sem palavras-passe** — OTP de 6 dígitos com Supabase
+- **Autenticação sem palavras-passe** — OTP por email com Supabase
   (`signInWithOtp` + `verifyOtp`), com a sessão renovada no middleware.
 - **App Router do Next.js (16)** — server/client components, route handlers,
   route groups (`(ui)`) e o novo middleware (`proxy.ts`).
@@ -194,7 +196,7 @@ vercel deploy          # 2. ou importa o repo em vercel.com
 3. Define as variáveis de ambiente em **Project → Settings → Environment Variables**.
 4. Em **Authentication → Emails → Templates → Magic Link**, substitui
    `{{ .ConfirmationURL }}` por `{{ .Token }}` para o Supabase enviar o código
-   de 6 dígitos (sem isto, o email continua a conter um link em vez do código).
+   de acesso (sem isto, o email continua a conter um link em vez do código).
 5. `vercel --prod`
 
 > O repositório está em `src/` — na Vercel, escolhe **Root Directory: `src`**.
