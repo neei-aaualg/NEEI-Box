@@ -19,12 +19,11 @@ export async function POST(request: Request) {
   }
 
   const supabase = await createClient();
-  const origin = new URL(request.url).origin;
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${origin}/api/auth/callback`,
+      shouldCreateUser: true,
     },
   });
 
@@ -33,9 +32,7 @@ export async function POST(request: Request) {
   }
 
   return NextResponse.json(
-    {
-      message: 'Magic link sent! Check your inbox.',
-    },
+    { message: 'Código de acesso enviado! Verifica o teu email.' },
     { status: 200 }
   );
 }

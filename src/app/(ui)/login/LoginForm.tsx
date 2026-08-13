@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const perks = [
   'Acesso a apontamentos, exames e apresentações',
@@ -11,15 +12,17 @@ const perks = [
 ];
 
 export default function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [token, setToken] = useState('');
+  const [step, setStep] = useState<'email' | 'code'>('email');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const ualgEmailRegex = /^a\d+@ualg\.pt$/;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const sendCode = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setErrorMsg('');
 
     const formattedEmail = email.trim().toLowerCase();
@@ -46,11 +49,58 @@ export default function LoginForm() {
 
       if (!response.ok) {
         throw new Error(
-          data.error || 'Ocorreu um erro ao enviar o link de acesso.'
+          data.error || 'Ocorreu um erro ao enviar o código de acesso.'
         );
       }
 
-      setSubmitted(true);
+      setToken('');
+      setStep('code');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setErrorMsg(err.message);
+      } else {
+        setErrorMsg('Ocorreu um erro inesperado. Tenta novamente.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMsg('');
+
+    if (!/^\d{6}$/.test(token.trim())) {
+      setErrorMsg(
+        'O código tem 6 dígitos. Verifica o email e tenta novamente.'
+      );
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          token: token.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || 'Código inválido ou expirado. Tenta novamente.'
+        );
+      }
+
+      router.push('/courses');
+      router.refresh();
     } catch (err: unknown) {
       if (err instanceof Error) {
         setErrorMsg(err.message);
@@ -152,18 +202,19 @@ export default function LoginForm() {
             </span>
           </div>
 
-          {!submitted ? (
+          {step === 'email' ? (
             <>
               <div className="mb-8">
                 <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
                   Bem-vindo de volta
                 </h1>
                 <p className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">
-                  Insere o teu email institucional para iniciar sessão.
+                  Insere o teu email institucional para receberes um código de
+                  acesso.
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <form onSubmit={sendCode} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
                   <label
                     htmlFor="email"
@@ -197,7 +248,7 @@ export default function LoginForm() {
                   disabled={loading}
                   className="mt-1 flex h-11 w-full items-center justify-center rounded-xl bg-brand-900 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-800 disabled:opacity-60 dark:bg-brand-500 dark:text-night-950 dark:hover:bg-brand-400"
                 >
-                  {loading ? 'A enviar...' : 'Enviar link de acesso'}
+                  {loading ? 'A enviar...' : 'Enviar código de acesso'}
                 </button>
               </form>
 
@@ -210,43 +261,82 @@ export default function LoginForm() {
               </p>
             </>
           ) : (
-            <div className="flex flex-col items-center gap-4 py-6 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
-                <svg
-                  aria-hidden="true"
-                  className="h-7 w-7"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
-                  />
-                </svg>
+            <>
+              <div className="mb-8">
+                <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
+                  Verifica o teu email
+                </h1>
+                <p className="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  Enviámos um código de 6 dígitos para{' '}
+                  <span className="font-semibold text-zinc-900 dark:text-white">
+                    {email}
+                  </span>
+                  .
+                </p>
               </div>
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
-                Verifica o teu email!
-              </h2>
-              <p className="max-w-xs text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                Enviámos um link mágico de acesso para{' '}
-                <span className="font-semibold text-zinc-900 dark:text-white">
-                  {email}
-                </span>
-                .
-              </p>
-              <button
-                onClick={() => {
-                  setSubmitted(false);
-                  setErrorMsg('');
-                }}
-                className="mt-2 text-xs font-medium text-brand-700 underline underline-offset-2 hover:text-brand-600 dark:text-brand-300 dark:hover:text-brand-200"
-              >
-                Utilizar outro email
-              </button>
-            </div>
+
+              <form onSubmit={verifyCode} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label
+                    htmlFor="token"
+                    className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
+                  >
+                    Código de acesso
+                  </label>
+                  <input
+                    id="token"
+                    type="text"
+                    required
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    placeholder="000000"
+                    value={token}
+                    onChange={(e) =>
+                      setToken(e.target.value.replace(/\D/g, '').slice(0, 6))
+                    }
+                    className="h-11 w-full rounded-xl border border-zinc-300 bg-white px-4 text-center text-lg font-semibold tracking-[0.35em] text-zinc-900 outline-none transition-shadow placeholder:text-zinc-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-night-900 dark:text-white dark:placeholder:text-zinc-600 dark:focus:border-brand-400"
+                  />
+                </div>
+
+                {errorMsg && (
+                  <div
+                    role="alert"
+                    className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
+                  >
+                    {errorMsg}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="mt-1 flex h-11 w-full items-center justify-center rounded-xl bg-brand-900 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-800 disabled:opacity-60 dark:bg-brand-500 dark:text-night-950 dark:hover:bg-brand-400"
+                >
+                  {loading ? 'A verificar...' : 'Entrar'}
+                </button>
+              </form>
+
+              <div className="mt-6 flex items-center justify-center gap-4 text-xs font-medium">
+                <button
+                  onClick={() => {
+                    setStep('email');
+                    setErrorMsg('');
+                  }}
+                  className="text-zinc-500 underline underline-offset-2 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                >
+                  Utilizar outro email
+                </button>
+                <span className="text-zinc-300 dark:text-zinc-700">·</span>
+                <button
+                  onClick={sendCode}
+                  disabled={loading}
+                  className="text-brand-700 underline underline-offset-2 hover:text-brand-600 dark:text-brand-300 dark:hover:text-brand-200"
+                >
+                  Reenviar código
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>
