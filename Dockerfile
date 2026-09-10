@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 # 1. Install dependencies only when needed
 FROM base AS deps
@@ -36,8 +36,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+# Install curl for Coolify and container healthchecks
+RUN apk add --no-cache curl && \
+  addgroup --system --gid 1001 nodejs && \
+  adduser --system --uid 1001 nextjs
 
 # Copy static assets and public folder
 COPY --from=builder /app/public ./public
@@ -53,8 +55,8 @@ USER nextjs
 
 EXPOSE 3000
 
-# Docker healthcheck using busybox wget (included in Alpine)
+# Container healthcheck using curl
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1
+  CMD curl -f http://127.0.0.1:3000/api/health || exit 1
 
 CMD ["node", "server.js"]
