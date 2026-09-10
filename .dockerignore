@@ -1,0 +1,12 @@
+.git
+.github
+node_modules
+src/node_modules
+.next
+src/.next
+docs
+supabase
+*.md
+.env*.local
+.DS_Store
+Thumbs.db
