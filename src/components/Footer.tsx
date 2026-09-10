@@ -23,6 +23,12 @@ export default function Footer({ user }: FooterProps) {
           — Universidade do Algarve
         </p>
         <nav className="flex items-center gap-5" aria-label="Rodapé">
+          <a
+            href="https://neei.online"
+            className="text-xs font-medium text-zinc-500 transition-colors hover:text-brand-700 dark:text-zinc-400 dark:hover:text-brand-300"
+          >
+            Site do NEEI
+          </a>
           {links.map((link) => (
             <Link
               key={link.href}

@@ -82,6 +82,29 @@ export default function Header({ user, isAdmin }: HeaderProps) {
         </nav>
 
         <div className="flex items-center gap-2">
+          <a
+            href="https://neei.online"
+            className="group inline-flex h-9 items-center gap-1.5 rounded-full border border-zinc-200/80 bg-zinc-50/70 px-3 text-xs font-medium text-zinc-700 transition-all hover:border-brand-300 hover:bg-brand-50 hover:text-brand-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:border-brand-800 dark:hover:bg-brand-950/40 dark:hover:text-brand-200"
+            title="Voltar ao site do NEEI (neei.online)"
+          >
+            <svg
+              aria-hidden="true"
+              className="h-3.5 w-3.5 text-zinc-500 transition-transform group-hover:-translate-x-0.5 dark:text-zinc-400"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+              />
+            </svg>
+            <span className="hidden sm:inline">Voltar ao site do NEEI</span>
+            <span className="sm:hidden">NEEI</span>
+          </a>
+
           {user ? (
             <>
               <span className="hidden max-w-44 truncate rounded-full bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-600 lg:block dark:bg-white/5 dark:text-zinc-400">
@@ -161,6 +184,29 @@ export default function Header({ user, isAdmin }: HeaderProps) {
           aria-label="Navegação móvel"
         >
           <div className="flex flex-col gap-1">
+            <a
+              href="https://neei.online"
+              className="mb-1 flex items-center justify-between rounded-xl border border-zinc-200/80 bg-zinc-50 px-4 py-2.5 text-sm font-medium text-zinc-800 transition-colors hover:bg-brand-50 hover:text-brand-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 dark:hover:bg-brand-950/40 dark:hover:text-brand-200"
+            >
+              <span className="flex items-center gap-2">
+                <svg
+                  aria-hidden="true"
+                  className="h-4 w-4 text-zinc-500 dark:text-zinc-400"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+                  />
+                </svg>
+                Voltar ao site do NEEI
+              </span>
+              <span className="text-xs text-zinc-400 dark:text-zinc-500">neei.online</span>
+            </a>
             {navItems.map((item) => (
               <Link
                 key={item.href}
