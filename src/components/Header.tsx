@@ -42,24 +42,17 @@ export default function Header({ user, isAdmin }: HeaderProps) {
         <div className="flex items-center gap-6 sm:gap-8">
           <Link
             href="/"
-            className="group flex h-16 max-h-16 items-center py-1 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
+            className="flex h-16 items-center rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
             aria-label="NEEI-Box — Início"
           >
-            <span className="relative flex h-full max-h-full shrink-0 items-center justify-center">
-              {/* Efeito Glow ambiente */}
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute -inset-1.5 rounded-full bg-cyan-400/25 blur-lg transition-all duration-300 group-hover:scale-125 group-hover:bg-cyan-400/50 group-hover:blur-xl dark:bg-cyan-400/30 dark:group-hover:bg-cyan-300/55"
-              />
-              <Image
-                src="/neei-logo-transp.png"
-                alt="NEEI-Box"
-                width={90}
-                height={58}
-                priority
-                className="relative h-full max-h-14 sm:max-h-16 w-auto object-contain transition-all duration-300 group-hover:scale-105 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)] group-hover:drop-shadow-[0_0_20px_rgba(34,211,238,0.9)]"
-              />
-            </span>
+            <Image
+              src="/neei-logo-transp.png"
+              alt="NEEI-Box"
+              width={90}
+              height={58}
+              priority
+              className="h-12 w-auto object-contain sm:h-14 drop-shadow-[0_0_6px_rgba(34,211,238,0.35)]"
+            />
           </Link>
 
           <nav
