@@ -2,13 +2,72 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-const perks = [
-  'Acesso a apontamentos, exames e apresentações',
-  'Materiais organizados por unidade curricular',
-  'Conteúdo revisto e aprovado pelo NEEI',
+const features = [
+  {
+    title: 'Apontamentos & Exames',
+    description:
+      'Sebentas, resumos e testes de anos anteriores partilhados por colegas de curso.',
+    icon: (
+      <svg
+        aria-hidden="true"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: 'Organização por Disciplina',
+    description:
+      'Materiais catalogados por ano curricular e semestre para estudo direto.',
+    icon: (
+      <svg
+        aria-hidden="true"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: 'Curadoria & Revisão',
+    description:
+      'Conteúdos verificados pela equipa do NEEI para garantir qualidade e relevância.',
+    icon: (
+      <svg
+        aria-hidden="true"
+        className="h-5 w-5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+        />
+      </svg>
+    ),
+  },
 ];
 
 export default function LoginForm() {
@@ -113,73 +172,98 @@ export default function LoginForm() {
   return (
     <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-2">
       {/* Painel de marca */}
-      <div className="relative hidden overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 p-12 lg:flex lg:flex-col lg:justify-between">
+      <div className="relative hidden overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 p-10 lg:flex lg:flex-col lg:justify-between lg:border-r lg:border-brand-800/40 xl:p-14 dark:lg:border-white/5">
+        {/* Padrão subtil de pontos */}
         <div
           aria-hidden="true"
-          className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-brand-500/20 blur-3xl"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.06)_1px,transparent_0)] [background-size:24px_24px]"
+        />
+
+        {/* Efeitos de iluminação ambiente */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-20 -top-20 h-96 w-96 rounded-full bg-brand-400/20 blur-3xl"
         />
         <div
           aria-hidden="true"
-          className="absolute -bottom-32 -right-16 h-96 w-96 rounded-full bg-brand-400/20 blur-3xl"
+          className="pointer-events-none absolute -bottom-28 -right-20 h-96 w-96 rounded-full bg-brand-500/20 blur-3xl"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-1/2 -left-24 h-72 w-72 -translate-y-1/2 rounded-full bg-brand-600/15 blur-3xl"
         />
 
-        <Link href="/" className="relative flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl ring-1 ring-white/20">
-            <Image
-              src="/neei.svg"
-              alt=""
-              width={44}
-              height={44}
-              className="h-full w-full object-cover"
-            />
-          </span>
-          <span className="text-lg font-bold tracking-tight text-white">
-            NEEI-Box
-          </span>
-        </Link>
+        {/* Cabeçalho do painel */}
+        <div className="relative">
+          <div className="inline-flex items-center gap-2 rounded-full border border-brand-400/25 bg-brand-500/15 px-3.5 py-1.5 text-xs font-semibold text-brand-200 backdrop-blur-md shadow-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-400" />
+            </span>
+            Repositório Académico · NEEI UAlg
+          </div>
+        </div>
 
-        <div className="relative max-w-md">
-          <h2 className="text-3xl font-bold leading-tight tracking-tight text-white">
+        {/* Conteúdo central */}
+        <div className="relative my-auto max-w-lg py-8">
+          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl xl:text-[2.65rem] xl:leading-[1.18]">
             O teu curso começa aqui —{' '}
-            <span className="text-brand-300">com ajuda de quem já passou.</span>
+            <span className="bg-gradient-to-r from-brand-200 via-brand-300 to-cyan-100 bg-clip-text text-transparent">
+              com ajuda de quem já passou.
+            </span>
           </h2>
-          <p className="mt-4 text-sm leading-relaxed text-brand-100/90">
+
+          <p className="mt-4 text-sm leading-relaxed text-brand-100/85 sm:text-base">
             Entra com o teu email institucional e explora centenas de materiais
             partilhados pela comunidade de Engenharia Informática da UAlg.
           </p>
 
-          <ul className="mt-8 space-y-3">
-            {perks.map((perk) => (
-              <li
-                key={perk}
-                className="flex items-center gap-3 text-sm text-brand-50/90"
+          <div className="mt-8 space-y-3">
+            {features.map((feature) => (
+              <div
+                key={feature.title}
+                className="group flex items-start gap-3.5 rounded-2xl border border-white/10 bg-white/[0.04] p-3.5 backdrop-blur-sm transition-all duration-200 hover:border-white/20 hover:bg-white/[0.07]"
               >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500/30 text-brand-200">
-                  <svg
-                    aria-hidden="true"
-                    className="h-3.5 w-3.5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M4.5 12.75l6 6 9-13.5"
-                    />
-                  </svg>
-                </span>
-                {perk}
-              </li>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/20 text-brand-200 ring-1 ring-white/10 transition-colors group-hover:bg-brand-500/30 group-hover:text-white">
+                  {feature.icon}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-white">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-0.5 text-xs leading-relaxed text-brand-100/75">
+                    {feature.description}
+                  </p>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center gap-2 pt-1">
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs font-medium text-brand-100/80">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              100% Gratuito
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs font-medium text-brand-100/80">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
+              Exclusivo UAlg
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs font-medium text-brand-100/80">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300" />
+              Feito por Estudantes
+            </span>
+          </div>
         </div>
 
-        <p className="relative text-xs text-brand-200/70">
-          © {new Date().getFullYear()} Núcleo de Estudantes de Engenharia
-          Informática — Universidade do Algarve
-        </p>
+        {/* Rodapé do painel */}
+        <div className="relative flex items-center justify-between border-t border-white/10 pt-5 text-xs text-brand-200/65">
+          <span>
+            © {new Date().getFullYear()} NEEI · Universidade do Algarve
+          </span>
+          <span className="hidden xl:inline text-brand-300/60">
+            Licenciatura & Mestrado
+          </span>
+        </div>
       </div>
 
       {/* Formulário */}
