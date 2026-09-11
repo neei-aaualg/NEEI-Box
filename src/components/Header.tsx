@@ -42,16 +42,22 @@ export default function Header({ user, isAdmin }: HeaderProps) {
         <div className="flex items-center gap-6 sm:gap-8">
           <Link
             href="/"
-            className="flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
+            className="group flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
             aria-label="NEEI-Box — Início"
           >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ring-zinc-900/10 dark:ring-white/10">
+            <span className="relative flex h-9 shrink-0 items-center justify-center">
+              {/* Efeito Glow ambiente */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -inset-1.5 rounded-full bg-cyan-400/25 blur-md transition-all duration-300 group-hover:scale-125 group-hover:bg-cyan-400/45 group-hover:blur-lg dark:bg-cyan-400/30 dark:group-hover:bg-cyan-300/50"
+              />
               <Image
-                src="/neei-logo1.png"
-                alt=""
-                width={36}
-                height={36}
-                className="h-full w-full object-cover"
+                src="/neei-logo-transp.png"
+                alt="NEEI Logo"
+                width={48}
+                height={31}
+                priority
+                className="relative h-8 w-auto object-contain drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_16px_rgba(34,211,238,0.85)]"
               />
             </span>
             <span className="truncate text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-white">
