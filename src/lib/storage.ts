@@ -6,6 +6,14 @@ const UPLOAD_DIR = process.env.UPLOAD_DIR
   ? path.resolve(process.env.UPLOAD_DIR)
   : path.resolve(process.cwd(), 'uploads');
 
+// Default: 50 MB per single file
+export const MAX_FILE_SIZE_MB = parseInt(process.env.MAX_FILE_SIZE_MB || '50', 10);
+export const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+// Default: 8 GB maximum volume storage capacity
+export const MAX_STORAGE_LIMIT_GB = parseFloat(process.env.MAX_STORAGE_LIMIT_GB || '8');
+export const MAX_STORAGE_LIMIT_BYTES = Math.floor(MAX_STORAGE_LIMIT_GB * 1024 * 1024 * 1024);
+
 function getSafePath(relativePath: string): string {
   const normalized = path.normalize(relativePath).replace(/^(\.\.[\/\\])+/, '');
   const resolved = path.resolve(UPLOAD_DIR, normalized);
@@ -13,6 +21,58 @@ function getSafePath(relativePath: string): string {
     throw new Error('Caminho de ficheiro inválido.');
   }
   return resolved;
+}
+
+export async function getTotalStorageUsedBytes(): Promise<number> {
+  let total = 0;
+
+  async function scanDir(dir: string) {
+    if (!existsSync(dir)) return;
+    try {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+      for (const entry of entries) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          await scanDir(full);
+        } else if (entry.isFile()) {
+          const stats = await fs.stat(full);
+          total += stats.size;
+        }
+      }
+    } catch {
+      // Ignore concurrent directory reads
+    }
+  }
+
+  await scanDir(UPLOAD_DIR);
+  return total;
+}
+
+export async function checkStorageCapacity(incomingBytes: number): Promise<{
+  allowed: boolean;
+  currentUsedBytes: number;
+  maxBytes: number;
+  error?: string;
+}> {
+  const currentUsedBytes = await getTotalStorageUsedBytes();
+  const maxBytes = MAX_STORAGE_LIMIT_BYTES;
+
+  if (currentUsedBytes + incomingBytes > maxBytes) {
+    const usedFormatted = (currentUsedBytes / (1024 * 1024 * 1024)).toFixed(2);
+    const incomingFormatted = (incomingBytes / (1024 * 1024)).toFixed(1);
+    return {
+      allowed: false,
+      currentUsedBytes,
+      maxBytes,
+      error: `Capacidade máxima de armazenamento de ${MAX_STORAGE_LIMIT_GB} GB atingida (${usedFormatted} GB ocupados). O envio de ${incomingFormatted} MB excede o espaço disponível.`,
+    };
+  }
+
+  return {
+    allowed: true,
+    currentUsedBytes,
+    maxBytes,
+  };
 }
 
 export async function saveFile(

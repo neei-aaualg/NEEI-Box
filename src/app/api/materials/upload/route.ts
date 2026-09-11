@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/db';
-import { saveFile } from '@/lib/storage';
+import {
+  saveFile,
+  MAX_FILE_SIZE_MB,
+  MAX_FILE_SIZE_BYTES,
+  checkStorageCapacity,
+} from '@/lib/storage';
 import { sanitizeFileName, getFileType } from '@/lib/file-types';
 import crypto from 'crypto';
-
-const MAX_FILE_SIZE_MB = 25;
 
 export async function POST(request: Request) {
   try {
@@ -37,10 +40,20 @@ export async function POST(request: Request) {
       );
     }
 
-    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+    // 1. Limite por ficheiro (ex: 50 MB)
+    if (file.size > MAX_FILE_SIZE_BYTES) {
       return NextResponse.json(
-        { error: `O ficheiro excede o limite de ${MAX_FILE_SIZE_MB} MB.` },
+        { error: `O ficheiro excede o limite máximo permitido de ${MAX_FILE_SIZE_MB} MB.` },
         { status: 413 }
+      );
+    }
+
+    // 2. Limite total do volume (8 GB)
+    const capacity = await checkStorageCapacity(file.size);
+    if (!capacity.allowed) {
+      return NextResponse.json(
+        { error: capacity.error || 'Espaço de armazenamento insuficiente no servidor.' },
+        { status: 507 }
       );
     }
 

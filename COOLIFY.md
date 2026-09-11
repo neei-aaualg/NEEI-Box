@@ -36,8 +36,10 @@ No separador **Environment Variables** da aplicação no Coolify, configure:
 # 1. Ligação à Base de Dados PostgreSQL
 DATABASE_URL=postgresql://postgres:sua-password@neei-box-db:5432/postgres?schema=public
 
-# 2. Caminho de Armazenamento no Contentor
+# 2. Caminho de Armazenamento no Contentor e Limites
 UPLOAD_DIR=/app/uploads
+MAX_FILE_SIZE_MB=50
+MAX_STORAGE_LIMIT_GB=8
 
 # 3. Servidor de Email SMTP (para envio de códigos de acesso OTP aos estudantes)
 SMTP_HOST=smtp.exemplo.com

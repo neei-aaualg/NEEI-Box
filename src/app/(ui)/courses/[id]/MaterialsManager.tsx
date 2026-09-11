@@ -127,6 +127,11 @@ export default function MaterialsManager({
       return;
     }
 
+    if (file.size > 50 * 1024 * 1024) {
+      setErrorMsg('O ficheiro selecionado excede o limite máximo de 50 MB.');
+      return;
+    }
+
     setUploading(true);
     setErrorMsg('');
 
@@ -578,7 +583,7 @@ export default function MaterialsManager({
                         Clica para escolher um ficheiro
                       </span>
                       <span className="text-[11px] text-zinc-400">
-                        PDF, DOCX, PPTX, XLSX, ZIP, imagens… (máx. 25 MB)
+                        PDF, DOCX, PPTX, XLSX, ZIP, imagens… (máx. 50 MB)
                       </span>
                     </>
                   )}
