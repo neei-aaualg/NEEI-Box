@@ -42,16 +42,16 @@ export default function Header({ user, isAdmin }: HeaderProps) {
         <div className="flex items-center gap-6 sm:gap-8">
           <Link
             href="/"
-            className="flex h-16 items-center rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
+            className="flex h-full items-center rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
             aria-label="NEEI-Box — Início"
           >
             <Image
               src="/neei-logo-transp.png"
               alt="NEEI-Box"
-              width={90}
-              height={58}
+              width={140}
+              height={90}
               priority
-              className="h-12 w-auto object-contain sm:h-14 drop-shadow-[0_0_6px_rgba(34,211,238,0.35)]"
+              className="h-14 w-auto object-contain sm:h-16 lg:h-[4.25rem] drop-shadow-[0_0_2.5px_rgba(34,211,238,0.25)]"
             />
           </Link>
 
@@ -64,11 +64,10 @@ export default function Header({ user, isAdmin }: HeaderProps) {
                 key={item.href}
                 href={item.href}
                 aria-current={isActive(item.href) ? 'page' : undefined}
-                className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                  isActive(item.href)
-                    ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
-                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white'
-                }`}
+                className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${isActive(item.href)
+                  ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
+                  : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white'
+                  }`}
               >
                 {item.label}
               </Link>
@@ -210,11 +209,10 @@ export default function Header({ user, isAdmin }: HeaderProps) {
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
                 aria-current={isActive(item.href) ? 'page' : undefined}
-                className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
-                  isActive(item.href)
-                    ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
-                    : 'text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-white/5'
-                }`}
+                className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${isActive(item.href)
+                  ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
+                  : 'text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-white/5'
+                  }`}
               >
                 {item.label}
               </Link>
