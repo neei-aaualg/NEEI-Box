@@ -128,7 +128,7 @@ export default function MaterialsManager({
     }
 
     if (file.size > 50 * 1024 * 1024) {
-      setErrorMsg('O ficheiro selecionado excede o limite máximo de 50 MB.');
+      setErrorMsg('O ficheiro selecionado excede o limite máximo de 4 MB.');
       return;
     }
 
@@ -318,19 +318,17 @@ export default function MaterialsManager({
                 role="tab"
                 aria-selected={statusFilter === tab.value}
                 onClick={() => setStatusFilter(tab.value)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  statusFilter === tab.value
-                    ? 'bg-brand-900 text-white dark:bg-brand-500 dark:text-night-950'
-                    : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-white/5'
-                }`}
+                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${statusFilter === tab.value
+                  ? 'bg-brand-900 text-white dark:bg-brand-500 dark:text-night-950'
+                  : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-white/5'
+                  }`}
               >
                 {tab.label}
                 <span
-                  className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
-                    statusFilter === tab.value
-                      ? 'bg-white/20 text-white'
-                      : 'bg-zinc-100 text-zinc-500 dark:bg-white/10 dark:text-zinc-400'
-                  }`}
+                  className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${statusFilter === tab.value
+                    ? 'bg-white/20 text-white'
+                    : 'bg-zinc-100 text-zinc-500 dark:bg-white/10 dark:text-zinc-400'
+                    }`}
                 >
                   {counts[tab.value]}
                 </span>
@@ -543,11 +541,10 @@ export default function MaterialsManager({
 
                 <label
                   htmlFor="material-file"
-                  className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors ${
-                    file
-                      ? 'border-brand-300 bg-brand-50/50 dark:border-brand-800 dark:bg-brand-950/30'
-                      : 'border-zinc-300 hover:border-brand-400 hover:bg-brand-50/50 dark:border-zinc-700 dark:hover:border-brand-700 dark:hover:bg-brand-950/30'
-                  }`}
+                  className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors ${file
+                    ? 'border-brand-300 bg-brand-50/50 dark:border-brand-800 dark:bg-brand-950/30'
+                    : 'border-zinc-300 hover:border-brand-400 hover:bg-brand-50/50 dark:border-zinc-700 dark:hover:border-brand-700 dark:hover:bg-brand-950/30'
+                    }`}
                 >
                   {file ? (
                     <>
@@ -583,7 +580,7 @@ export default function MaterialsManager({
                         Clica para escolher um ficheiro
                       </span>
                       <span className="text-[11px] text-zinc-400">
-                        PDF, DOCX, PPTX, XLSX, ZIP, imagens… (máx. 50 MB)
+                        PDF, DOCX, PPTX, XLSX, ZIP, imagens… (máx. 4 MB)
                       </span>
                     </>
                   )}
