@@ -22,6 +22,11 @@ export const metadata: Metadata = {
   },
   description:
     'A plataforma do Núcleo de Estudantes de Engenharia Informática da Universidade do Algarve para partilhar apontamentos, exames e materiais de estudo entre estudantes.',
+  icons: {
+    icon: [{ url: '/neei-logo1.png' }, { url: '/favicon.ico' }],
+    apple: [{ url: '/neei-logo1.png' }],
+    shortcut: '/neei-logo1.png',
+  },
 };
 
 export default async function RootLayout({
@@ -38,10 +43,7 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-white font-sans text-zinc-900 dark:bg-night-950 dark:text-zinc-50">
-        <Header
-          user={user ? { email: user.email } : null}
-          isAdmin={isAdmin}
-        />
+        <Header user={user ? { email: user.email } : null} isAdmin={isAdmin} />
         <main className="flex-1">{children}</main>
         <Footer user={user ? { email: user.email } : null} />
       </body>

@@ -46,7 +46,7 @@ export default function Header({ user, isAdmin }: HeaderProps) {
         >
           <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ring-zinc-900/10 dark:ring-white/10">
             <Image
-              src="/neei.svg"
+              src="/neei-logo1.png"
               alt=""
               width={36}
               height={36}
@@ -55,9 +55,6 @@ export default function Header({ user, isAdmin }: HeaderProps) {
           </span>
           <span className="truncate text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-white">
             NEEI-Box
-            <span className="ml-1.5 hidden rounded-full bg-brand-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-brand-800 sm:inline-block dark:bg-brand-950 dark:text-brand-300">
-              UAlg
-            </span>
           </span>
         </Link>
 
@@ -205,7 +202,9 @@ export default function Header({ user, isAdmin }: HeaderProps) {
                 </svg>
                 Voltar ao site do NEEI
               </span>
-              <span className="text-xs text-zinc-400 dark:text-zinc-500">neei.online</span>
+              <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                neei.online
+              </span>
             </a>
             {navItems.map((item) => (
               <Link
