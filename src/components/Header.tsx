@@ -39,44 +39,46 @@ export default function Header({ user, isAdmin }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-200/70 bg-white/80 backdrop-blur-xl dark:border-white/5 dark:bg-night-950/80">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link
-          href="/"
-          className="flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
-          aria-label="NEEI-Box — Início"
-        >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ring-zinc-900/10 dark:ring-white/10">
-            <Image
-              src="/neei-logo1.png"
-              alt=""
-              width={36}
-              height={36}
-              className="h-full w-full object-cover"
-            />
-          </span>
-          <span className="truncate text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-white">
-            NEEI-Box
-          </span>
-        </Link>
+        <div className="flex items-center gap-6 sm:gap-8">
+          <Link
+            href="/"
+            className="flex min-w-0 items-center gap-2.5 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
+            aria-label="NEEI-Box — Início"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ring-zinc-900/10 dark:ring-white/10">
+              <Image
+                src="/neei-logo1.png"
+                alt=""
+                width={36}
+                height={36}
+                className="h-full w-full object-cover"
+              />
+            </span>
+            <span className="truncate text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-white">
+              NEEI-Box
+            </span>
+          </Link>
 
-        <nav
-          className="hidden items-center gap-1 md:flex"
-          aria-label="Navegação principal"
-        >
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isActive(item.href) ? 'page' : undefined}
-              className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                isActive(item.href)
-                  ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
-                  : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+          <nav
+            className="hidden items-center gap-1 md:flex"
+            aria-label="Navegação principal"
+          >
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                  isActive(item.href)
+                    ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
+                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
         <div className="flex items-center gap-2">
           <a
