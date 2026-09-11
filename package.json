@@ -1,0 +1,13 @@
+{
+  "name": "neei-box",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NEEI-Box: Repositório de Materiais do NEEI-AAUAlg",
+  "scripts": {
+    "dev": "npm run dev --prefix src",
+    "build": "npm run build --prefix src",
+    "start": "npm run start --prefix src",
+    "lint": "npm run lint --prefix src",
+    "prisma": "npm run --prefix src prisma"
+  }
+}
