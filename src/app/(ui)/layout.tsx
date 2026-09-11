@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/auth/session';
 import './globals.css';
 
 const geistSans = Geist({
@@ -29,23 +29,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  let isAdmin = false;
-
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    isAdmin = profile?.role === 'ADMIN';
-  }
+  const user = await getCurrentUser();
+  const isAdmin = user?.role === 'ADMIN';
 
   return (
     <html
@@ -54,11 +39,11 @@ export default async function RootLayout({
     >
       <body className="flex min-h-full flex-col bg-white font-sans text-zinc-900 dark:bg-night-950 dark:text-zinc-50">
         <Header
-          user={user ? { email: user.email ?? '' } : null}
+          user={user ? { email: user.email } : null}
           isAdmin={isAdmin}
         />
         <main className="flex-1">{children}</main>
-        <Footer user={user ? { email: user.email ?? '' } : null} />
+        <Footer user={user ? { email: user.email } : null} />
       </body>
     </html>
   );

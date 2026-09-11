@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import type { Course } from '@/lib/types';
 
 interface Props {
@@ -20,7 +19,6 @@ export default function CoursesManager({
   fetchError,
 }: Props) {
   const router = useRouter();
-  const supabase = createClient();
 
   const [courses, setCourses] = useState<Course[]>(initialCourses);
 
@@ -73,60 +71,71 @@ export default function CoursesManager({
       semester: Number(form.semester),
     };
 
-    if (editingCourse) {
-      const { data, error } = await supabase
-        .from('courses')
-        .update(payload)
-        .eq('id', editingCourse.id)
-        .select()
-        .single();
+    try {
+      if (editingCourse) {
+        const res = await fetch(`/api/courses/${editingCourse.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
 
-      if (error) {
-        setErrorMsg(error.message);
-      } else if (data) {
-        setCourses((prev) =>
-          prev.map((c) => (c.id === editingCourse.id ? data : c))
-        );
-        setIsFormModalOpen(false);
-        router.refresh();
-      }
-    } else {
-      const { data, error } = await supabase
-        .from('courses')
-        .insert([payload])
-        .select()
-        .single();
+        if (!res.ok) {
+          setErrorMsg(data.error || 'Erro ao atualizar.');
+        } else {
+          setCourses((prev) =>
+            prev.map((c) => (c.id === editingCourse.id ? data : c))
+          );
+          setIsFormModalOpen(false);
+          router.refresh();
+        }
+      } else {
+        const res = await fetch('/api/courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
 
-      if (error) {
-        setErrorMsg(error.message);
-      } else if (data) {
-        setCourses((prev) => [data, ...prev]);
-        setIsFormModalOpen(false);
-        router.refresh();
+        if (!res.ok) {
+          setErrorMsg(data.error || 'Erro ao criar.');
+        } else {
+          setCourses((prev) => [data, ...prev]);
+          setIsFormModalOpen(false);
+          router.refresh();
+        }
       }
+    } catch {
+      setErrorMsg('Erro de comunicação com o servidor.');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const handleConfirmDelete = async () => {
     if (!deletingCourse) return;
 
     setLoading(true);
-    const { error } = await supabase
-      .from('courses')
-      .delete()
-      .eq('id', deletingCourse.id);
+    try {
+      const res = await fetch(`/api/courses/${deletingCourse.id}`, {
+        method: 'DELETE',
+      });
 
-    if (error) {
-      setErrorMsg(`Erro ao eliminar: ${error.message}`);
-    } else {
-      setCourses((prev) => prev.filter((c) => c.id !== deletingCourse.id));
-      setDeletingCourse(null);
-      router.refresh();
+      if (!res.ok) {
+        const data = await res.json();
+        setErrorMsg(`Erro ao eliminar: ${data.error || 'Falha ao eliminar.'}`);
+      } else {
+        setCourses((prev) => prev.filter((c) => c.id !== deletingCourse.id));
+        setDeletingCourse(null);
+        router.refresh();
+      }
+    } catch {
+      setErrorMsg('Erro de comunicação ao eliminar.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
+
 
   const filteredCourses = courses.filter((course) => {
     const matchesName = course.name

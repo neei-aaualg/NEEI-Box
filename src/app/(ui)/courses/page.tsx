@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/auth/session';
+import prisma from '@/lib/db';
 import CoursesManager from './CoursesManager';
 import type { Course } from '@/lib/types';
 
@@ -9,43 +10,47 @@ export const metadata: Metadata = {
 };
 
 export default async function CoursesPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     redirect('/login');
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+  const isAdmin = user.role === 'ADMIN';
 
-  const isAdmin = profile?.role === 'ADMIN';
+  try {
+    const courses = await prisma.course.findMany({
+      include: {
+        _count: {
+          select: { materials: true },
+        },
+      },
+      orderBy: { name: 'asc' },
+    });
 
-  const { data: courses, error } = await supabase
-    .from('courses')
-    .select('id, name, year, semester, created_at, materials(count)')
-    .order('name', { ascending: true });
+    const normalized: Course[] = courses.map((course) => ({
+      id: course.id,
+      name: course.name,
+      year: course.year,
+      semester: course.semester,
+      created_at: course.createdAt.toISOString(),
+      materials_count: course._count.materials,
+    }));
 
-  const normalized: Course[] = (courses || []).map((course) => ({
-    id: course.id,
-    name: course.name,
-    year: course.year,
-    semester: course.semester,
-    created_at: course.created_at,
-    materials_count: (course.materials as { count: number }[])?.[0]?.count ?? 0,
-  }));
-
-  return (
-    <CoursesManager
-      initialCourses={normalized}
-      isAdmin={isAdmin}
-      fetchError={error?.message}
-    />
-  );
+    return (
+      <CoursesManager
+        initialCourses={normalized}
+        isAdmin={isAdmin}
+      />
+    );
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Erro ao carregar Unidades Curriculares.';
+    return (
+      <CoursesManager
+        initialCourses={[]}
+        isAdmin={isAdmin}
+        fetchError={msg}
+      />
+    );
+  }
 }

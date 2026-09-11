@@ -7,8 +7,9 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy dependency specifications from src/
+# Copy dependency specifications and prisma schema
 COPY src/package.json src/package-lock.json ./
+COPY src/prisma ./prisma/
 RUN npm ci
 
 # 2. Rebuild the source code only when needed
@@ -17,11 +18,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY src/ .
 
-# Environment variables needed at build time by Next.js for client bundle inlining
-ARG NEXT_PUBLIC_SUPABASE_URL=""
-ARG NEXT_PUBLIC_SUPABASE_ANON_KEY=""
-ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+# Generate Prisma Client
+RUN npx prisma generate
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
@@ -35,11 +33,14 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
+ENV UPLOAD_DIR="/app/uploads"
 
 # Install curl for Coolify and container healthchecks
 RUN apk add --no-cache curl && \
   addgroup --system --gid 1001 nodejs && \
-  adduser --system --uid 1001 nextjs
+  adduser --system --uid 1001 nextjs && \
+  mkdir -p /app/uploads && \
+  chown -R nextjs:nodejs /app/uploads
 
 # Copy static assets and public folder
 COPY --from=builder /app/public ./public

@@ -1,42 +1,19 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
 
-export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({ request });
+const SESSION_COOKIE_NAME = 'neei_box_session';
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export function proxy(request: NextRequest) {
+  const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const isAuthenticated = Boolean(sessionCookie);
 
   const { pathname } = request.nextUrl;
 
-  if (!user && pathname.startsWith('/api/materials')) {
+  if (!isAuthenticated && pathname.startsWith('/api/materials')) {
     return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
   }
 
   if (
-    !user &&
+    !isAuthenticated &&
     (pathname.startsWith('/courses') || pathname.startsWith('/admin'))
   ) {
     const url = request.nextUrl.clone();
@@ -44,15 +21,15 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && pathname === '/login') {
+  if (isAuthenticated && pathname === '/login') {
     const url = request.nextUrl.clone();
     url.pathname = '/courses';
     return NextResponse.redirect(url);
   }
 
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/((?!api/materials/upload|.*\\..*).*)'],
+  matcher: ['/((?!api/materials/upload|api/health|api/files|.*\\..*).*)'],
 };

@@ -1,0 +1,77 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  role      Role       @default(STUDENT)
+  createdAt DateTime   @default(now()) @map("created_at")
+  materials Material[]
+  sessions  Session[]
+
+  @@map("profiles")
+}
+
+model Course {
+  id        String     @id @default(uuid())
+  name      String
+  year      Int
+  semester  Int
+  createdAt DateTime   @default(now()) @map("created_at")
+  materials Material[]
+
+  @@map("courses")
+}
+
+model Material {
+  id           String   @id @default(uuid())
+  courseId     String   @map("course_id")
+  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title        String
+  description  String?
+  storagePath  String?  @map("storage_path")
+  webUrl       String   @map("web_url")
+  fileName     String?  @map("file_name")
+  fileType     String?  @map("file_type")
+  fileSize     Int?     @map("file_size")
+  reviewStatus String   @default("pending") @map("review_status")
+  uploadedById String   @map("uploaded_by")
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("materials")
+}
+
+model OtpToken {
+  id        String   @id @default(uuid())
+  email     String
+  tokenHash String   @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([email])
+  @@map("otp_tokens")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("sessions")
+}

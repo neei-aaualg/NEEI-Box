@@ -1,17 +1,7 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { destroySession } from '@/lib/auth/session';
 
 export async function POST() {
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.signOut();
-
-  if (error) {
-    return NextResponse.json(
-      { error: 'Ocorreu um erro ao terminar a sessão.' },
-      { status: 500 }
-    );
-  }
-
+  await destroySession();
   return NextResponse.json({ success: true });
 }
