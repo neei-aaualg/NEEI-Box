@@ -42,22 +42,22 @@ export default function Header({ user, isAdmin }: HeaderProps) {
         <div className="flex items-center gap-6 sm:gap-8">
           <Link
             href="/"
-            className="group flex items-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
+            className="group flex h-16 max-h-16 items-center py-1 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
             aria-label="NEEI-Box — Início"
           >
-            <span className="relative flex h-11 shrink-0 items-center justify-center">
+            <span className="relative flex h-full max-h-full shrink-0 items-center justify-center">
               {/* Efeito Glow ambiente */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute -inset-2 rounded-full bg-cyan-400/25 blur-lg transition-all duration-300 group-hover:scale-125 group-hover:bg-cyan-400/50 group-hover:blur-xl dark:bg-cyan-400/30 dark:group-hover:bg-cyan-300/55"
+                className="pointer-events-none absolute -inset-1.5 rounded-full bg-cyan-400/25 blur-lg transition-all duration-300 group-hover:scale-125 group-hover:bg-cyan-400/50 group-hover:blur-xl dark:bg-cyan-400/30 dark:group-hover:bg-cyan-300/55"
               />
               <Image
                 src="/neei-logo-transp.png"
                 alt="NEEI-Box"
-                width={80}
-                height={52}
+                width={90}
+                height={58}
                 priority
-                className="relative h-10 w-auto object-contain transition-all duration-300 group-hover:scale-105 sm:h-11 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)] group-hover:drop-shadow-[0_0_18px_rgba(34,211,238,0.9)]"
+                className="relative h-full max-h-14 sm:max-h-16 w-auto object-contain transition-all duration-300 group-hover:scale-105 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)] group-hover:drop-shadow-[0_0_20px_rgba(34,211,238,0.9)]"
               />
             </span>
           </Link>

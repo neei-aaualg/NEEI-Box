@@ -191,7 +191,7 @@ export default function Home() {
             <h1 className="mt-6 text-4xl font-bold leading-[1.1] tracking-tight text-zinc-900 sm:text-5xl lg:text-6xl dark:text-white">
               Partilha o conhecimento.{' '}
               <span className="bg-gradient-to-r from-brand-600 via-brand-500 to-brand-400 bg-clip-text text-transparent dark:from-brand-300 dark:via-brand-400 dark:to-brand-500">
-                Passa todas as cadeiras.
+                Passa a todas as cadeiras.
               </span>
             </h1>
 
