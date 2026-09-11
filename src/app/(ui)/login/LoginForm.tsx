@@ -7,8 +7,16 @@ import { useRouter } from 'next/navigation';
 const features = [
   {
     title: 'Apontamentos & Exames',
+    tag: 'PDFs & Sebentas',
     description:
       'Sebentas, resumos e testes de anos anteriores partilhados por colegas de curso.',
+    borderColor: 'border-sky-400/40 hover:border-sky-300',
+    bgColor: 'bg-gradient-to-r from-sky-500/10 via-brand-500/5 to-transparent hover:from-sky-500/15',
+    shadowColor:
+      'shadow-[0_0_24px_-4px_rgba(56,189,248,0.2)] hover:shadow-[0_0_28px_-2px_rgba(56,189,248,0.35)]',
+    iconBorder:
+      'border-sky-400/60 bg-sky-500/20 text-sky-200 shadow-[0_0_14px_rgba(56,189,248,0.35)]',
+    tagStyle: 'border-sky-400/40 bg-sky-400/15 text-sky-200',
     icon: (
       <svg
         aria-hidden="true"
@@ -28,8 +36,16 @@ const features = [
   },
   {
     title: 'Organização por Disciplina',
+    tag: '1º ao 3º Ano',
     description:
       'Materiais catalogados por ano curricular e semestre para estudo direto.',
+    borderColor: 'border-cyan-400/40 hover:border-cyan-300',
+    bgColor: 'bg-gradient-to-r from-cyan-500/10 via-teal-500/5 to-transparent hover:from-cyan-500/15',
+    shadowColor:
+      'shadow-[0_0_24px_-4px_rgba(34,211,238,0.2)] hover:shadow-[0_0_28px_-2px_rgba(34,211,238,0.35)]',
+    iconBorder:
+      'border-cyan-400/60 bg-cyan-500/20 text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.35)]',
+    tagStyle: 'border-cyan-400/40 bg-cyan-400/15 text-cyan-200',
     icon: (
       <svg
         aria-hidden="true"
@@ -49,8 +65,16 @@ const features = [
   },
   {
     title: 'Curadoria & Revisão',
+    tag: 'Verificado',
     description:
       'Conteúdos verificados pela equipa do NEEI para garantir qualidade e relevância.',
+    borderColor: 'border-emerald-400/40 hover:border-emerald-300',
+    bgColor: 'bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent hover:from-emerald-500/15',
+    shadowColor:
+      'shadow-[0_0_24px_-4px_rgba(52,211,153,0.2)] hover:shadow-[0_0_28px_-2px_rgba(52,211,153,0.35)]',
+    iconBorder:
+      'border-emerald-400/60 bg-emerald-500/20 text-emerald-200 shadow-[0_0_14px_rgba(52,211,153,0.35)]',
+    tagStyle: 'border-emerald-400/40 bg-emerald-400/15 text-emerald-200',
     icon: (
       <svg
         aria-hidden="true"
@@ -172,33 +196,33 @@ export default function LoginForm() {
   return (
     <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-2">
       {/* Painel de marca */}
-      <div className="relative hidden overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 p-10 lg:flex lg:flex-col lg:justify-between lg:border-r lg:border-brand-800/40 xl:p-14 dark:lg:border-white/5">
-        {/* Padrão subtil de pontos */}
+      <div className="relative hidden overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-[#072535] p-10 lg:flex lg:flex-col lg:justify-between lg:border-r lg:border-cyan-500/20 xl:p-14">
+        {/* Padrão subtil de pontos em tom ciano */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.06)_1px,transparent_0)] [background-size:24px_24px]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(100,189,226,0.14)_1px,transparent_0)] [background-size:24px_24px]"
         />
 
-        {/* Efeitos de iluminação ambiente */}
+        {/* Efeitos de iluminação ambiente com cores vibrantes */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -left-20 -top-20 h-96 w-96 rounded-full bg-brand-400/20 blur-3xl"
+          className="pointer-events-none absolute -left-16 -top-16 h-[420px] w-[420px] rounded-full bg-cyan-400/20 blur-[100px]"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-28 -right-20 h-96 w-96 rounded-full bg-brand-500/20 blur-3xl"
+          className="pointer-events-none absolute -bottom-24 -right-16 h-[440px] w-[440px] rounded-full bg-sky-500/25 blur-[110px]"
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 -left-24 h-72 w-72 -translate-y-1/2 rounded-full bg-brand-600/15 blur-3xl"
+          className="pointer-events-none absolute top-1/2 left-10 -translate-y-1/2 h-[350px] w-[350px] rounded-full bg-cyan-500/10 blur-[90px]"
         />
 
-        {/* Cabeçalho do painel */}
+        {/* Cabeçalho do painel com outline luminosa */}
         <div className="relative">
-          <div className="inline-flex items-center gap-2 rounded-full border border-brand-400/25 bg-brand-500/15 px-3.5 py-1.5 text-xs font-semibold text-brand-200 backdrop-blur-md shadow-sm">
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/50 bg-gradient-to-r from-cyan-500/20 via-sky-500/15 to-brand-500/10 px-3.5 py-1.5 text-xs font-semibold text-cyan-200 shadow-[0_0_20px_rgba(34,211,238,0.25)] ring-1 ring-cyan-400/20 backdrop-blur-md">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-400" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
             </span>
             Repositório Académico · NEEI UAlg
           </div>
@@ -208,7 +232,7 @@ export default function LoginForm() {
         <div className="relative my-auto max-w-lg py-8">
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl xl:text-[2.65rem] xl:leading-[1.18]">
             O teu curso começa aqui —{' '}
-            <span className="bg-gradient-to-r from-brand-200 via-brand-300 to-cyan-100 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-300 via-sky-200 to-teal-200 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(34,211,238,0.35)]">
               com ajuda de quem já passou.
             </span>
           </h2>
@@ -218,20 +242,29 @@ export default function LoginForm() {
             partilhados pela comunidade de Engenharia Informática da UAlg.
           </p>
 
-          <div className="mt-8 space-y-3">
+          <div className="mt-8 space-y-3.5">
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="group flex items-start gap-3.5 rounded-2xl border border-white/10 bg-white/[0.04] p-3.5 backdrop-blur-sm transition-all duration-200 hover:border-white/20 hover:bg-white/[0.07]"
+                className={`group flex items-start gap-4 rounded-2xl border ${feature.borderColor} ${feature.bgColor} ${feature.shadowColor} p-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5`}
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/20 text-brand-200 ring-1 ring-white/10 transition-colors group-hover:bg-brand-500/30 group-hover:text-white">
+                <div
+                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${feature.iconBorder} transition-transform duration-300 group-hover:scale-105`}
+                >
                   {feature.icon}
                 </div>
-                <div className="min-w-0">
-                  <h3 className="text-sm font-semibold text-white">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-0.5 text-xs leading-relaxed text-brand-100/75">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-sm font-semibold tracking-tight text-white">
+                      {feature.title}
+                    </h3>
+                    <span
+                      className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${feature.tagStyle}`}
+                    >
+                      {feature.tag}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs leading-relaxed text-brand-100/80">
                     {feature.description}
                   </p>
                 </div>
@@ -239,29 +272,29 @@ export default function LoginForm() {
             ))}
           </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-2 pt-1">
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs font-medium text-brand-100/80">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+          <div className="mt-6 flex flex-wrap items-center gap-2.5 pt-1">
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/50 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-200 shadow-[0_0_12px_rgba(52,211,153,0.2)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
               100% Gratuito
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs font-medium text-brand-100/80">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-sky-400/50 bg-sky-500/15 px-3 py-1.5 text-xs font-semibold text-sky-200 shadow-[0_0_12px_rgba(56,189,248,0.2)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_6px_#38bdf8]" />
               Exclusivo UAlg
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs font-medium text-brand-100/80">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300" />
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/50 bg-cyan-500/15 px-3 py-1.5 text-xs font-semibold text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,0.2)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]" />
               Feito por Estudantes
             </span>
           </div>
         </div>
 
         {/* Rodapé do painel */}
-        <div className="relative flex items-center justify-between border-t border-white/10 pt-5 text-xs text-brand-200/65">
+        <div className="relative flex items-center justify-between border-t border-cyan-400/20 pt-5 text-xs text-brand-200/70">
           <span>
             © {new Date().getFullYear()} NEEI · Universidade do Algarve
           </span>
-          <span className="hidden xl:inline text-brand-300/60">
-            Licenciatura & Mestrado
+          <span className="hidden xl:inline text-cyan-300/80 font-medium">
+            Licenciatura
           </span>
         </div>
       </div>
