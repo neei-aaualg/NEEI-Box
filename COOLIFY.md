@@ -57,13 +57,14 @@ ADMIN_EMAILS="a79994@ualg.pt"
 
 ## 4. Inicialização das Tabelas da Base de Dados
 
-Após o primeiro deploy com sucesso:
-1. No Coolify, abra o separador **Terminal** da aplicação.
-2. Execute o comando:
-   ```bash
-   npx prisma db push
-   ```
-   Isto criará automaticamente as tabelas `profiles`, `courses`, `materials`, `sessions` e `otp_tokens` na base de dados PostgreSQL.
+As tabelas são agora criadas e sincronizadas **automaticamente no arranque do contentor** assim que a variável `DATABASE_URL` estiver configurada.
+
+Caso pretenda forçar ou verificar manualmente via **Terminal** da aplicação no Coolify, basta executar:
+```bash
+prisma db push
+```
+Isto utiliza o binário local do Prisma 6.4.1 incluído na imagem, criando/atualizando as tabelas `profiles`, `courses`, `materials`, `sessions` e `otp_tokens`.
+
 
 ---
 
