@@ -51,7 +51,7 @@ export default function Header({ user, isAdmin }: HeaderProps) {
               width={140}
               height={90}
               priority
-              className="h-14 w-auto object-contain sm:h-16 lg:h-[4.25rem] drop-shadow-[0_0_2.5px_rgba(34,211,238,0.25)]"
+              className="h-14 w-auto object-contain sm:h-16 lg:h-[2.35rem] drop-shadow-[0_0_2.5px_rgba(34,211,238,0.25)]"
             />
           </Link>
 
