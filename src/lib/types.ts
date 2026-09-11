@@ -33,3 +33,11 @@ export const STATUS_LABELS: Record<MaterialStatus, string> = {
   approved: 'Aprovado',
   rejected: 'Rejeitado',
 };
+
+export type AdminUser = {
+  id: string;
+  email: string;
+  role: 'STUDENT' | 'ADMIN';
+  created_at: string;
+};
+

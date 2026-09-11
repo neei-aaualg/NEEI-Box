@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/db';
 import AdminManager from './AdminManager';
-import type { MaterialWithCourse } from '@/lib/types';
+import type { AdminUser, MaterialWithCourse } from '@/lib/types';
 
 export const metadata: Metadata = {
   title: 'Administração',
@@ -20,7 +20,7 @@ export default async function AdminPage() {
     redirect('/courses');
   }
 
-  const [pendingMaterials, approvedMaterials] = await Promise.all([
+  const [pendingMaterials, approvedMaterials, dbUsers] = await Promise.all([
     prisma.material.findMany({
       where: { reviewStatus: 'pending' },
       include: { course: { select: { name: true } } },
@@ -30,6 +30,12 @@ export default async function AdminPage() {
       where: { reviewStatus: 'approved' },
       include: { course: { select: { name: true } } },
       orderBy: { createdAt: 'desc' },
+    }),
+    prisma.user.findMany({
+      orderBy: [
+        { role: 'asc' },
+        { createdAt: 'desc' },
+      ],
     }),
   ]);
 
@@ -48,16 +54,27 @@ export default async function AdminPage() {
       courses: { id: m.courseId, name: m.course.name },
     }));
 
+  const initialUsers: AdminUser[] = dbUsers.map((u) => ({
+    id: u.id,
+    email: u.email,
+    role: u.role,
+    created_at: u.createdAt.toISOString(),
+  }));
+
   const counts = {
     pending: pendingMaterials.length,
     approved: approvedMaterials.length,
+    admins: dbUsers.filter((u) => u.role === 'ADMIN').length,
   };
 
   return (
     <AdminManager
       initialPending={toMaterials(pendingMaterials)}
       initialApproved={toMaterials(approvedMaterials)}
+      initialUsers={initialUsers}
+      currentUserId={user.id}
       initialCounts={counts}
     />
   );
 }
+
