@@ -12,12 +12,18 @@ const prismaMocks = vi.hoisted(() => ({
 const cookieMocks = vi.hoisted(() => {
   const store = {
     map: new Map<string, { value: string }>(),
-    options: new Map<string, { secure?: boolean }>(),
+    options: new Map<string, { secure?: boolean; priority?: string }>(),
     get: vi.fn((name: string) => store.map.get(name) ?? undefined),
-    set: vi.fn((name: string, value: string, opts?: { secure?: boolean }) => {
-      store.map.set(name, { value });
-      if (opts) store.options.set(name, opts);
-    }),
+    set: vi.fn(
+      (
+        name: string,
+        value: string,
+        opts?: { secure?: boolean; priority?: string }
+      ) => {
+        store.map.set(name, { value });
+        if (opts) store.options.set(name, opts);
+      }
+    ),
     delete: vi.fn((name: string) => {
       store.map.delete(name);
     }),

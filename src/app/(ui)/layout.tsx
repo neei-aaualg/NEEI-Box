@@ -62,6 +62,10 @@ export default async function RootLayout({
     >
       <head>
         <meta name="theme-color" content="#ffffff" />
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self'"
+        />
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="flex min-h-full flex-col bg-white font-sans text-zinc-900 dark:bg-night-950 dark:text-zinc-50">

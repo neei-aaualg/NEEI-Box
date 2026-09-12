@@ -4,6 +4,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { Readable, Transform } from 'stream';
 import { pipeline } from 'stream/promises';
+import type { ReadableStream as WebReadableStream } from 'node:stream/web';
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR
   ? path.resolve(process.env.UPLOAD_DIR)
@@ -142,7 +143,7 @@ export async function saveFileStream(
 
   try {
     await pipeline(
-      Readable.fromWeb(stream),
+      Readable.fromWeb(stream as unknown as WebReadableStream),
       limitGuard,
       createWriteStream(tempPath)
     );
