@@ -10,7 +10,10 @@ interface Params {
 export async function PATCH(request: Request, { params }: Params) {
   const user = await getCurrentUser();
   if (!user || user.role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Acesso restrito a administradores.' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'Acesso restrito a administradores.' },
+      { status: 403 }
+    );
   }
 
   try {
@@ -41,7 +44,10 @@ export async function PATCH(request: Request, { params }: Params) {
       materials_count: updated._count.materials,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erro ao atualizar Unidade Curricular.';
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Erro ao atualizar Unidade Curricular.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -49,7 +55,10 @@ export async function PATCH(request: Request, { params }: Params) {
 export async function DELETE(request: Request, { params }: Params) {
   const user = await getCurrentUser();
   if (!user || user.role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Acesso restrito a administradores.' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'Acesso restrito a administradores.' },
+      { status: 403 }
+    );
   }
 
   try {
@@ -73,7 +82,10 @@ export async function DELETE(request: Request, { params }: Params) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erro ao eliminar Unidade Curricular.';
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Erro ao eliminar Unidade Curricular.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

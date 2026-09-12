@@ -1,139 +1,111 @@
-# ☁️ Guia de Deploy no Vercel
+# Deploy do NEEI-Box em produção (Coolify)
 
-Este guia descreve, passo a passo, como colocar o **NEEI-Box** em produção na
-[Vercel](https://vercel.com), o serviço onde o Next.js corre nativamente.
+Guia de deploy da arquitetura **auto-hospedada** atual. O NEEI-Box corre numa
+única imagem Docker gerida pelo [Coolify](https://coolify.io): UI, API, base de
+dados (PostgreSQL), ficheiros (volume) e envio de emails (SMTP) — sem serviços
+SaaS externos.
 
-> **Nota importante:** o código da aplicação está dentro de `src/`. Em todos
-> os passos abaixo em que a Vercel pede a *Root Directory*, escolhe `src`.
-
----
-
-## 0. Pré-requisitos
-
-- Uma conta na [Vercel](https://vercel.com/signup) (pode ser com GitHub).
-- O código do projeto num repositório Git (GitHub, GitLab ou Bitbucket).
-- O projeto **Supabase** configurado (tabelas, auth por email e Storage —
-  ver [README → Configuração do Supabase](../README.md#configuração-do-supabase)).
+> Guia curto e operacional: [`COOLIFY.md`](../COOLIFY.md).
 
 ---
 
-## 1. Importar o repositório
+## 1. Visão geral do deploy
 
-**Opção A — Dashboard (recomendada)**
-
-1. Vai a [vercel.com/new](https://vercel.com/new) e inicia sessão.
-2. Clica em **Import Project** e seleciona o repositório do NEEI-Box.
-3. A Vercel deteta automaticamente o framework **Next.js**.
-
-**Opção B — CLI**
-
-```bash
-npm i -g vercel
-cd src
-vercel deploy
+```
+git push/PR → GitHub Actions (format · lint · build) → Coolify (build + deploy)
+                                                             │
+                HEALTHCHECK (30s) ──► GET /api/health ─────────┘
 ```
 
-Na primeira execução, a CLI liga-te à conta e pede-te o *scope* do projeto.
+- O Dockerfile é **multi-stage** (`node:22-alpine`), com `output: 'standalone'`
+  e o binário **Prisma incluído** na imagem final (para `prisma db push`).
+- No arranque, se `DATABASE_URL` estiver definida, a app corre
+  `prisma db push --skip-generate` — as tabelas (`profiles`, `courses`,
+  `materials`, `sessions`, `otp_tokens`) são criadas/sincronizadas sozinhas.
+- O Docker `HEALTHCHECK` (30s/5s×10/3 retries) valida `GET /api/health`.
 
 ---
 
-## 2. Configurar o projeto
+## 2. Criar a base de dados PostgreSQL
 
-Durante o *import*, a Vercel faz um *build* de pré-visualização. Configura
-isto antes do primeiro deploy de produção:
+No Coolify, Project → **+ New Resource → Database → PostgreSQL**:
 
-| Definição | Valor |
-| --- | --- |
-| **Framework Preset** | Next.js (automático) |
-| **Root Directory** | `src` |
-| **Build Command** | `npm run build` (automático) |
-| **Install Command** | `npm install` (automático) |
-| **Output Directory** | `.next` (automático) |
-
-> Se o repo raiz contiver `.gitignore` a ignorar `.env*`, garante que o
-> `.env.local` **não** é enviado para o Git (o `.gitignore` já o impede).
+1. Dá-lhe um nome (ex. `neei-box-db`) e clica **Start/Deploy**.
+2. Copia a **Internal Connection String**, ex.:
+   `postgresql://postgres:password@neei-box-db:5432/postgres?schema=public`
+   — vais usá-la em `DATABASE_URL`.
 
 ---
 
-## 3. Variáveis de ambiente
+## 3. Configurar o volume persistente (uploads)
 
-Vai a **Project → Settings → Environment Variables** e adiciona **todas** as
-variáveis do `.env.example`, nos ambientes *Production*, *Preview* e
-*Development*:
+Na aplicação NEEI-Box no Coolify → **Storages / Persistent Storage**:
 
-| Nome | Exemplo |
-| --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://abcdefg.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGciOi...` |
+- **Name:** `neei-box-uploads`
+- **Destination Path:** `/app/uploads`
 
-⚠️ A chave `NEXT_PUBLIC_SUPABASE_ANON_KEY` é pública por definição — está no
-código do cliente. O acesso real aos dados é limitado pelas políticas RLS do
-Supabase.
+Garante que os ficheiros partilhados sobrevivem a reinícios e atualizações.
 
 ---
 
-## 4. Deploy
+## 4. Variáveis de ambiente
 
-Depois de guardar as variáveis:
+Configura no Coolify (Environment Variables):
 
-```bash
-vercel --prod
+```env
+# Base de dados
+DATABASE_URL=postgresql://postgres:password@neei-box-db:5432/postgres?schema=public
+
+# Armazenamento local e limites
+UPLOAD_DIR=/app/uploads
+MAX_FILE_SIZE_MB=50
+MAX_STORAGE_LIMIT_GB=8
+
+# Envio dos códigos OTP
+SMTP_HOST=smtp.exemplo.com
+SMTP_PORT=587
+SMTP_USER=seu-email@dominio.com
+SMTP_PASS=sua-password-ou-app-token
+SMTP_FROM="NEEI-Box <no-reply@neei.online>"
+
+# Administradores iniciais (emails separados por vírgula)
+ADMIN_EMAILS="a79994@ualg.pt"
 ```
 
-ou, no dashboard, **Deploy → Production**. Cada `git push` para a branch de
-produção volta a disparar o deploy automaticamente.
+> As antigas `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+> **já não existem** no projeto — podem ser removidas.
 
 ---
 
-## 5. Configurar o Supabase para produção
+## 5. Deploy e health-check
 
-1. Vai ao projeto Supabase → **Authentication → URL Configuration**.
-2. Adiciona o *Redirect URL*:
-   `https://<o-teu-dominio>.vercel.app/api/auth/callback`
-3. (Opcional) Se usares domínio próprio, adiciona também
-   `https://www.<o-teu-dominio>/api/auth/callback`.
-
-> Sem isto, o *magic link* do email aponta para o `localhost` e o login falha.
-
-O armazenamento de ficheiros (bucket `materials` e políticas RLS) não depende
-do domínio — configura-o uma única vez como descrito no README.
+1. No Coolify, liga o repositório GitHub e escolhe o branch `main`.
+2. Clica **Deploy** — o Coolify compila o Dockerfile e arranca o contentor.
+3. Verifica:
+   - `GET <dominio>/api/health` → `{"status":"ok",...}`;
+   - o login com `aXXXXX@ualg.pt` envia o código OTP e entra;
+   - o upload de um ficheiro aparece em `/admin` e, após aprovação, fica visível.
 
 ---
 
-## 6. Verificar
+## 6. Manutenção
 
-Abre `https://<o-teu-dominio>.vercel.app` e confirma:
-
-1. ✅ A landing page carrega e é responsiva.
-2. ✅ O login com `aXXXXX@ualg.pt` envia o email e o link funciona.
-3. ✅ As unidades curriculares e os materiais aprovados aparecem.
-4. ✅ O painel `/admin` só abre para contas com role `ADMIN`.
-5. ✅ O upload de um ficheiro aparece em `/admin` e, depois de aprovado, fica
-   disponível com a pré-visualização (imagens).
-
----
+- **Schema:** `prisma db push` automático no arranque; também disponível no
+  terminal do contentor (`npx prisma db push`).
+- **Backups:** agenda backups da BD (Coolify → Base de dados) e do volume
+  `neei-box-uploads`.
+- **Config da imagem:** `docker compose`/`deploy` do Coolify usa o `Dockerfile`
+  da raiz — alterações de runtime vivem nas env vars acima.
 
 ## 7. Problemas comuns
 
 | Sintoma | Causa provável | Solução |
 | --- | --- | --- |
-| Login não conclui após clicar no email | Redirect URL errado no Supabase | Atualiza o *Redirect URL* (passo 5) |
-| Build falha com `NEXT_PUBLIC_*` em falta | Variáveis públicas ausentes | Garante `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
-| Upload devolve "Falha ao guardar o ficheiro" | Políticas do bucket em falta ou bucket não público | Executa o SQL da migração (README → Configuração do Supabase) |
-| Eliminar material não apaga o ficheiro | Role `ADMIN` não definido no perfil | Atualiza `profiles.role` para `ADMIN` na tabela |
-| Erros de *deploy* no GitHub Actions | — | A CI corre apenas no repo; o deploy usa a Vercel |
-| Funções com *timeout* no upload | Ficheiros grandes (25 MB+) | O limite atual é 25 MB por ficheiro |
+| API devolve `401` em tudo | `DATABASE_URL` errada ou BD sem tabelas | Confirma a *internal connection string* e que `prisma db push` correu |
+| Login sem receber email | SMTP ausente/errado | Configura `SMTP_*`; sem SMTP, o código sai no log (`[AUTH-DEV]`) |
+| Upload devolve `413`/`507` | Ficheiro >50 MB ou volume cheio (8 GB) | Reduz o ficheiro ou aumenta o limite |
+| Aplicação reinicia com dados apagados | Volume não montado | Cria *persistent storage* `/app/uploads` |
 
 ---
 
-## 8. Domínio próprio (opcional)
-
-1. Vercel → **Project → Settings → Domains** → **Add**.
-2. Adiciona o domínio e segue as instruções de DNS (registo `A` ou `CNAME`).
-3. Repete o passo 5 com o novo domínio.
-
----
-
-Feito ✅. Qualquer questão adicional, consulta a
-
-[documentação de deploy do Next.js](https://nextjs.org/docs/app/building-your-application/deploying).
+Cobertura completa de decisões e diagramas: [`README.md`](../README.md).

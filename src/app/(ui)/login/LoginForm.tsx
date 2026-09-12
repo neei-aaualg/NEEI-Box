@@ -11,7 +11,8 @@ const features = [
     description:
       'Sebentas, resumos e testes de anos anteriores partilhados por colegas de curso.',
     borderColor: 'border-sky-400/40 hover:border-sky-300',
-    bgColor: 'bg-gradient-to-r from-sky-500/10 via-brand-500/5 to-transparent hover:from-sky-500/15',
+    bgColor:
+      'bg-gradient-to-r from-sky-500/10 via-brand-500/5 to-transparent hover:from-sky-500/15',
     shadowColor:
       'shadow-[0_0_24px_-4px_rgba(56,189,248,0.2)] hover:shadow-[0_0_28px_-2px_rgba(56,189,248,0.35)]',
     iconBorder:
@@ -40,7 +41,8 @@ const features = [
     description:
       'Materiais catalogados por ano curricular e semestre para estudo direto.',
     borderColor: 'border-cyan-400/40 hover:border-cyan-300',
-    bgColor: 'bg-gradient-to-r from-cyan-500/10 via-teal-500/5 to-transparent hover:from-cyan-500/15',
+    bgColor:
+      'bg-gradient-to-r from-cyan-500/10 via-teal-500/5 to-transparent hover:from-cyan-500/15',
     shadowColor:
       'shadow-[0_0_24px_-4px_rgba(34,211,238,0.2)] hover:shadow-[0_0_28px_-2px_rgba(34,211,238,0.35)]',
     iconBorder:
@@ -69,7 +71,8 @@ const features = [
     description:
       'Conteúdos verificados pela equipa do NEEI para garantir qualidade e relevância.',
     borderColor: 'border-emerald-400/40 hover:border-emerald-300',
-    bgColor: 'bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent hover:from-emerald-500/15',
+    bgColor:
+      'bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent hover:from-emerald-500/15',
     shadowColor:
       'shadow-[0_0_24px_-4px_rgba(52,211,153,0.2)] hover:shadow-[0_0_28px_-2px_rgba(52,211,153,0.35)]',
     iconBorder:

@@ -11,10 +11,7 @@ export async function GET() {
     }
 
     const users = await prisma.user.findMany({
-      orderBy: [
-        { role: 'asc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ role: 'asc' }, { createdAt: 'desc' }],
     });
 
     return NextResponse.json({
@@ -26,7 +23,8 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro ao obter utilizadores.';
+    const msg =
+      error instanceof Error ? error.message : 'Erro ao obter utilizadores.';
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
@@ -43,7 +41,10 @@ export async function POST(request: Request) {
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json(
-        { error: 'Email inválido. Certifica-te de introduzir um endereço correto.' },
+        {
+          error:
+            'Email inválido. Certifica-te de introduzir um endereço correto.',
+        },
         { status: 400 }
       );
     }
@@ -66,7 +67,8 @@ export async function POST(request: Request) {
       message: `Utilizador ${email} definido como ${role === 'ADMIN' ? 'Administrador' : 'Estudante'}.`,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro ao atualizar utilizador.';
+    const msg =
+      error instanceof Error ? error.message : 'Erro ao atualizar utilizador.';
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

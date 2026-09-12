@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface HeaderProps {
   user: { email: string } | null;
@@ -81,10 +82,11 @@ export default function Header({ user, isAdmin }: HeaderProps) {
                 key={item.href}
                 href={item.href}
                 aria-current={isActive(item.href) ? 'page' : undefined}
-                className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${isActive(item.href)
-                  ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
-                  : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white'
-                  }`}
+                className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                  isActive(item.href)
+                    ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
+                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white'
+                }`}
               >
                 {item.label}
               </Link>
@@ -93,6 +95,8 @@ export default function Header({ user, isAdmin }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
+
           <a
             href="https://neei.online"
             className="group inline-flex h-9 items-center gap-1.5 rounded-full border border-zinc-200/80 bg-zinc-50/70 px-3 text-xs font-medium text-zinc-700 transition-all hover:border-brand-300 hover:bg-brand-50 hover:text-brand-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:border-brand-800 dark:hover:bg-brand-950/40 dark:hover:text-brand-200"
@@ -226,10 +230,11 @@ export default function Header({ user, isAdmin }: HeaderProps) {
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
                 aria-current={isActive(item.href) ? 'page' : undefined}
-                className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${isActive(item.href)
-                  ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
-                  : 'text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-white/5'
-                  }`}
+                className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
+                  isActive(item.href)
+                    ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
+                    : 'text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-white/5'
+                }`}
               >
                 {item.label}
               </Link>

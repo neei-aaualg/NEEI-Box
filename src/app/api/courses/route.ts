@@ -32,7 +32,10 @@ export async function GET() {
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user || user.role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Acesso restrito a administradores.' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'Acesso restrito a administradores.' },
+      { status: 403 }
+    );
   }
 
   try {
@@ -40,7 +43,10 @@ export async function POST(request: Request) {
     const { name, year, semester } = body;
 
     if (!name || typeof year !== 'number' || typeof semester !== 'number') {
-      return NextResponse.json({ error: 'Dados da Unidade Curricular inválidos.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Dados da Unidade Curricular inválidos.' },
+        { status: 400 }
+      );
     }
 
     const course = await prisma.course.create({
@@ -60,7 +66,10 @@ export async function POST(request: Request) {
       materials_count: 0,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erro ao criar Unidade Curricular.';
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Erro ao criar Unidade Curricular.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

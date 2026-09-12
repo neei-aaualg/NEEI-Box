@@ -6,7 +6,10 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     if (!body.email) {
-      return NextResponse.json({ error: 'O email é obrigatório.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'O email é obrigatório.' },
+        { status: 400 }
+      );
     }
 
     const email = (body.email as string).trim().toLowerCase();
@@ -22,7 +25,10 @@ export async function POST(request: Request) {
 
     if (!isAllowed) {
       return NextResponse.json(
-        { error: 'Endereço de email inválido. Deve ser no formato aXXXXX@ualg.pt' },
+        {
+          error:
+            'Endereço de email inválido. Deve ser no formato aXXXXX@ualg.pt',
+        },
         { status: 400 }
       );
     }
@@ -40,7 +46,8 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro interno do servidor.';
+    const msg =
+      error instanceof Error ? error.message : 'Erro interno do servidor.';
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

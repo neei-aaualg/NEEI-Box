@@ -20,7 +20,11 @@ export async function POST(request: Request) {
     const verification = await verifyOtpCode(email, token);
     if (!verification.success) {
       return NextResponse.json(
-        { error: verification.error || 'Código inválido ou expirado. Tenta novamente.' },
+        {
+          error:
+            verification.error ||
+            'Código inválido ou expirado. Tenta novamente.',
+        },
         { status: 400 }
       );
     }
@@ -32,7 +36,9 @@ export async function POST(request: Request) {
       .map((e) => e.trim())
       .filter(Boolean);
 
-    const initialRole: Role = adminEmails.includes(email) ? Role.ADMIN : Role.STUDENT;
+    const initialRole: Role = adminEmails.includes(email)
+      ? Role.ADMIN
+      : Role.STUDENT;
 
     // Get or create user profile
     const user = await prisma.user.upsert({
@@ -49,7 +55,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro na autenticação.';
+    const msg =
+      error instanceof Error ? error.message : 'Erro na autenticação.';
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

@@ -42,7 +42,8 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erro ao eliminar material.';
+    const message =
+      error instanceof Error ? error.message : 'Erro ao eliminar material.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

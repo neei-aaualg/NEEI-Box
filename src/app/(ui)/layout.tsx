@@ -15,6 +15,23 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+const themeInitScript = `(function () {
+  try {
+    var stored = localStorage.getItem('neei-box-theme');
+    var dark =
+      stored === 'dark' ||
+      (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', dark);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'theme-color';
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', dark ? '#040b11' : '#ffffff');
+  } catch (e) {}
+})();`;
+
 export const metadata: Metadata = {
   title: {
     default: 'NEEI-Box · Partilha de Materiais de Estudo',
@@ -40,8 +57,13 @@ export default async function RootLayout({
   return (
     <html
       lang="pt"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <meta name="theme-color" content="#ffffff" />
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="flex min-h-full flex-col bg-white font-sans text-zinc-900 dark:bg-night-950 dark:text-zinc-50">
         <Header user={user ? { email: user.email } : null} isAdmin={isAdmin} />
         <main className="flex-1">{children}</main>
