@@ -99,15 +99,13 @@ describe('createSession', () => {
     );
   });
 
-  it('sets secure=true in production', async () => {
-    vi.stubEnv('NODE_ENV', 'production');
-    try {
-      prismaMocks.session.create.mockResolvedValue({});
-      await createSession('user-1');
-      expect(cookieMocks.options.get(SESSION_COOKIE_NAME)?.secure).toBe(true);
-    } finally {
-      vi.unstubAllEnvs();
-    }
+  it('sets secure=true and priority high with the __Host- prefix', async () => {
+    prismaMocks.session.create.mockResolvedValue({});
+    await createSession('user-1');
+    expect(SESSION_COOKIE_NAME).toMatch(/^__Host-/);
+    const opts = cookieMocks.options.get(SESSION_COOKIE_NAME);
+    expect(opts?.secure).toBe(true);
+    expect(opts?.priority).toBe('high');
   });
 
   it('returns the raw token', async () => {

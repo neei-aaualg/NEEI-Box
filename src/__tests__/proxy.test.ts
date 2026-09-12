@@ -7,7 +7,7 @@ const BASE = 'https://example.com';
 
 function makeRequest(pathname: string, withSession = false) {
   const headers = new Headers();
-  if (withSession) headers.set('cookie', `neei_box_session=${SESSION}`);
+  if (withSession) headers.set('cookie', `__Host-neei_box_session=${SESSION}`);
   return new NextRequest(`${BASE}${pathname}`, { headers });
 }
 

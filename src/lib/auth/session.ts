@@ -3,7 +3,11 @@ import { cookies } from 'next/headers';
 import prisma from '@/lib/db';
 import type { User } from '@prisma/client';
 
-export const SESSION_COOKIE_NAME = 'neei_box_session';
+// __Host- prefix requires Secure, Path=/, and no Domain attribute; browsers
+// drop the cookie entirely if those invariants are violated, which prevents
+// injection/overwriting from sibling domains. HTTPS is enforced in production;
+// localhost is treated as a secure context so dev login keeps working.
+export const SESSION_COOKIE_NAME = '__Host-neei_box_session';
 const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 function hashToken(token: string): string {
@@ -26,10 +30,11 @@ export async function createSession(userId: string) {
 
   cookieStore.set(SESSION_COOKIE_NAME, rawToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: true,
     sameSite: 'lax',
     path: '/',
     expires: expiresAt,
+    priority: 'high',
   });
 
   return rawToken;

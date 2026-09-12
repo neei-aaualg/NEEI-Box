@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { rateLimit, clientIpFromHeaders } from '@/lib/rate-limit';
 
-const SESSION_COOKIE_NAME = 'neei_box_session';
+const SESSION_COOKIE_NAME = '__Host-neei_box_session';
 
 function isProtectedPagePath(pathname: string): boolean {
   return (
