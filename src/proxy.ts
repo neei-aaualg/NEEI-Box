@@ -30,6 +30,8 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
+// Only these paths are protected by the proxy. Everything else — including
+// public API routes such as /api/health and /api/auth/* — is left untouched.
 export const config = {
   matcher: [
     '/courses/:path*',
