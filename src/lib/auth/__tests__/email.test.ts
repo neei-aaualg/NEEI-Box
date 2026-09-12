@@ -52,6 +52,21 @@ describe('sendOtpEmail', () => {
     spy.mockRestore();
   });
 
+  it('fails closed in production instead of printing OTP codes to logs', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    try {
+      const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      await expect(sendOtpEmail('a12345@ualg.pt', '123456')).rejects.toThrow(
+        'Serviço de email não configurado.'
+      );
+      expect(spy).not.toHaveBeenCalled();
+      expect(nodemailerMocks.createTransport).not.toHaveBeenCalled();
+      spy.mockRestore();
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it('creates an SMTP transport when fully configured', async () => {
     process.env.SMTP_HOST = SMTP_HOST;
     process.env.SMTP_PORT = SMTP_PORT;
