@@ -21,12 +21,35 @@ export async function PATCH(request: Request, { params }: Params) {
     const body = await request.json();
     const { name, year, semester } = body;
 
+    if (year !== undefined) {
+      if (typeof year !== 'number' || !Number.isInteger(year) || year < 1) {
+        return NextResponse.json(
+          { error: 'Dados da Unidade Curricular inválidos.' },
+          { status: 400 }
+        );
+      }
+    }
+
+    if (semester !== undefined) {
+      if (
+        typeof semester !== 'number' ||
+        !Number.isInteger(semester) ||
+        semester < 1 ||
+        semester > 2
+      ) {
+        return NextResponse.json(
+          { error: 'Dados da Unidade Curricular inválidos.' },
+          { status: 400 }
+        );
+      }
+    }
+
     const updated = await prisma.course.update({
       where: { id },
       data: {
         ...(name ? { name: name.trim() } : {}),
-        ...(typeof year === 'number' ? { year } : {}),
-        ...(typeof semester === 'number' ? { semester } : {}),
+        ...(year !== undefined ? { year } : {}),
+        ...(semester !== undefined ? { semester } : {}),
       },
       include: {
         _count: {

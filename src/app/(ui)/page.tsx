@@ -60,7 +60,7 @@ const features = [
   {
     title: 'Armazenamento seguro',
     description:
-      'Os ficheiros ficam guardados no Supabase Storage, com ligações estáveis e seguras.',
+      'Os ficheiros ficam guardados com segurança na plataforma, com ligações estáveis e sempre disponíveis para a comunidade.',
     icon: (
       <path
         strokeLinecap="round"

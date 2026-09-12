@@ -81,12 +81,25 @@ export function getFileNameFromWebUrl(webUrl: string): string {
   try {
     const url = new URL(webUrl);
     const file = url.searchParams.get('file');
-    if (file) return decodeURIComponent(file);
-  } catch {}
+    if (file) {
+      try {
+        return decodeURIComponent(file);
+      } catch {
+        return file;
+      }
+    }
+  } catch {
+    // Fall through to segment-based extraction.
+  }
 
   const segments = webUrl.split('/');
   const last = segments[segments.length - 1]?.split('?')[0];
-  return last && last !== 'Doc.aspx' ? decodeURIComponent(last) : 'material';
+  if (!last || last === 'Doc.aspx') return 'material';
+  try {
+    return decodeURIComponent(last);
+  } catch {
+    return last;
+  }
 }
 
 export function sanitizeFileName(fileName: string): string {
@@ -96,7 +109,7 @@ export function sanitizeFileName(fileName: string): string {
     .replace(/[^A-Za-z0-9._-]+/g, '_')
     .replace(/^_+|_+$/g, '');
 
-  if (!cleaned || cleaned === '.') return 'ficheiro';
+  if (!cleaned || /^\.+$/.test(cleaned)) return 'ficheiro';
 
   const MAX_LENGTH = 80;
   if (cleaned.length <= MAX_LENGTH) return cleaned;

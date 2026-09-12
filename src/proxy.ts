@@ -2,6 +2,15 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 const SESSION_COOKIE_NAME = 'neei_box_session';
 
+function isProtectedPagePath(pathname: string): boolean {
+  return (
+    pathname === '/courses' ||
+    pathname.startsWith('/courses/') ||
+    pathname === '/admin' ||
+    pathname.startsWith('/admin/')
+  );
+}
+
 export function proxy(request: NextRequest) {
   const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
   const isAuthenticated = Boolean(sessionCookie);
@@ -12,19 +21,12 @@ export function proxy(request: NextRequest) {
     return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
   }
 
-  if (
-    !isAuthenticated &&
-    (pathname.startsWith('/courses') || pathname.startsWith('/admin'))
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    return NextResponse.redirect(url);
+  if (!isAuthenticated && isProtectedPagePath(pathname)) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   if (isAuthenticated && pathname === '/login') {
-    const url = request.nextUrl.clone();
-    url.pathname = '/courses';
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(new URL('/courses', request.url));
   }
 
   return NextResponse.next();

@@ -42,7 +42,15 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, year, semester } = body;
 
-    if (!name || typeof year !== 'number' || typeof semester !== 'number') {
+    const validYear =
+      typeof year === 'number' && Number.isInteger(year) && year >= 1;
+    const validSemester =
+      typeof semester === 'number' &&
+      Number.isInteger(semester) &&
+      semester >= 1 &&
+      semester <= 2;
+
+    if (!name || !validYear || !validSemester) {
       return NextResponse.json(
         { error: 'Dados da Unidade Curricular inválidos.' },
         { status: 400 }

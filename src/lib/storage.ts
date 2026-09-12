@@ -24,7 +24,9 @@ export const MAX_STORAGE_LIMIT_BYTES = Math.floor(
 function getSafePath(relativePath: string): string {
   const normalized = path.normalize(relativePath).replace(/^(\.\.[\/\\])+/, '');
   const resolved = path.resolve(UPLOAD_DIR, normalized);
-  if (!resolved.startsWith(UPLOAD_DIR)) {
+  const isInside =
+    resolved === UPLOAD_DIR || resolved.startsWith(UPLOAD_DIR + path.sep);
+  if (!isInside) {
     throw new Error('Caminho de ficheiro inválido.');
   }
   return resolved;
