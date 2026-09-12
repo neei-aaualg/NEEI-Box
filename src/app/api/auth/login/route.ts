@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createAndSendOtp } from '@/lib/auth/otp';
+import { rateLimit } from '@/lib/rate-limit';
+
+// Max codes per email per window; prevents OTP churn on a victim's address.
+const EMAIL_LIMIT = 5;
+const EMAIL_WINDOW_MS = 15 * 60 * 1000;
 
 export async function POST(request: Request) {
   try {
@@ -30,6 +35,23 @@ export async function POST(request: Request) {
             'Endereço de email inválido. Deve ser no formato aXXXXX@ualg.pt',
         },
         { status: 400 }
+      );
+    }
+
+    const { allowed, retryAfterMs } = rateLimit(
+      `login:${email}`,
+      EMAIL_LIMIT,
+      EMAIL_WINDOW_MS
+    );
+    if (!allowed) {
+      const seconds = retryAfterMs
+        ? Math.ceil(retryAfterMs / 1000)
+        : EMAIL_WINDOW_MS / 1000;
+      return NextResponse.json(
+        {
+          error: `Demasiados pedidos para este email. Aguarda ${seconds}s.`,
+        },
+        { status: 429 }
       );
     }
 
