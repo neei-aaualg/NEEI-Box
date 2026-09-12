@@ -1,15 +1,24 @@
 # NEEI-Box
 
-> Partilha de materiais de estudo da comunidade de **Engenharia Informática da Universidade do Algarve**.
+> **Partilha de materiais de estudo da comunidade de Engenharia Informática da Universidade do Algarve.**
 
-O **NEEI-Box** é uma plataforma web onde os estudantes do Núcleo de Estudantes
-de Engenharia Informática (NEEI) da UAlg partilham apontamentos, exames
-resolvidos, apresentações e sebentas — organizados por unidade curricular, ano
-e semestre, com revisão e aprovação pela equipa do NEEI.
+O **NEEI-Box** é a plataforma web do Núcleo de Estudantes de Engenharia
+Informática (NEEI) da UAlg para partilhar apontamentos, exames resolvidos,
+apresentações e sebentas — organizados por **unidade curricular, ano e
+semestre**, com um fluxo de **revisão e aprovação** pela equipa do NEEI.
+
+Está em produção, é usado pela comunidade (mais de 500 materiais partilhados)
+e é **100% auto-hospedado**: a equipa controla o código, a base de dados, os
+ficheiros e o processo de deploy, do `git push` à *health check*.
+
+![CI - Code Quality & Build Check](https://github.com/neei-aaualg/NEEI-Box/actions/workflows/ci.yml/badge.svg)
+![Licença](https://img.shields.io/badge/license-MIT-blue)
 
 **Stack:** [Next.js 16](https://nextjs.org) (App Router) · [React 19](https://react.dev) ·
-[TypeScript](https://www.typescriptlang.org) · [Tailwind CSS v4](https://tailwindcss.com) ·
-[Supabase](https://supabase.com) (auth + PostgreSQL + Storage)
+[TypeScript](https://www.typescriptlang.org) (estrito) ·
+[Tailwind CSS v4](https://tailwindcss.com) · [Prisma 6](https://www.prisma.io) ·
+[PostgreSQL](https://www.postgresql.org) · [Node.js 22](https://nodejs.org) ·
+[Docker](https://www.docker.com) · self-hosted em [Coolify](https://coolify.io)
 
 ---
 
@@ -17,197 +26,376 @@ e semestre, com revisão e aprovação pela equipa do NEEI.
 
 | Área | Descrição |
 | --- | --- |
-| **Login por email institucional** | Autenticação com código OTP (sem palavras-passe), restrita a emails `aXXXXX@ualg.pt`. |
-| **Unidades Curriculares** | Catálogo de UCs organizado por ano e semestre, com pesquisa e filtros. |
-| **Partilha de materiais** | Upload de ficheiros (PDF, DOCX, PPTX, XLSX, ZIP, imagens…) com título e descrição. |
-| **Revisão por administradores** | Cada material passa por um fluxo de aprovação/rejeição antes de ficar público. |
-| **Painel de administração** | `/admin` — filas de materiais pendentes/aprovados/rejeitados com ações rápidas. |
-| **Pré-visualização de materiais** | Imagens pré-visualizadas diretamente do storage (com fallback visual por tipo de ficheiro). |
-| **Terminar sessão** | Endpoint `POST /api/auth/logout` + botão no cabeçalho. |
-| **Design responsivo** | Interface adaptada a telemóvel, tablet e desktop, com suporte a *dark mode* automático. |
+| **Login sem palavras-passe** | Código OTP (6 dígitos) enviado por email, restrito a contas da UAlg (`aXXXXX@ualg.pt`). Sessões seguras em cookie `httpOnly`. |
+| **Unidades Curriculares** | Catálogo de UCs agrupado por ano e semestre, com pesquisa por nome e filtros. |
+| **Materiais** | Upload de ficheiros (PDF, DOCX, PPTX, XLSX, ZIP, imagens…) com pré-visualização por tipo. |
+| **Etiquetas por UC** | A `description` de cada material é interpretada como um conjunto de **etiquetas** (ex. `Frequências`, `Exame`), com **filtro por etiqueta** dentro de cada unidade curricular. |
+| **Upload com etiquetas existentes** | No formulário de upload escolhe-se entre as etiquetas já existentes na UC (multi-seleção por *chips*), evitando texto livre e *tag pollution*. |
+| **Fluxo de revisão** | Materiais de estudantes entram como `pending`; os administradores aprovam ou rejeitam antes de ficarem públicos. |
+| **Painel de administração** | `/admin` — filas de pendentes/aprovados/rejeitados, gestão de UCs e de utilizadores (promover/demover admins com proteção contra auto-demissão). |
+| **Light/Dark mode** | Alternador de tema com persistência (localStorage + preferência do sistema), sem *flash* de tema (FOUC-free). |
+| **Design responsivo** | Mobile-first, acessível (`aria-*`, semântica, `lang="pt"`), impulsionado pela identidade visual do NEEI. |
+| **Health-check** | `/api/health` público para o `HEALTHCHECK` do Docker. |
+
+---
 
 ## Arquitetura
 
-```
-┌─────────────────┐  código OTP  ┌───────────────┐   sessão   ┌──────────┐
-│   Supabase Auth │ ◄─────────── │  Next.js 16   │ ─────────► │  Proxy   │
-└─────────────────┘                │ (App Router)  │            │ (middleware)
-        │                          └──────┬───┬────┘            └──────────┘
-        │ PostgreSQL (profiles,          │   │
-        │ courses, materials)            │   │ upload / download
-        ▼                                ▼   ▼
-  ┌─────────────────┐           ┌──────────────────┐
-  │    Supabase DB  │           │  Supabase Storage │
-  └─────────────────┘           │ (bucket "materials")
-                                └──────────────────┘
-```
+`docs/architecture.png` · [editável `docs/architecture.drawio`](docs/architecture.drawio)
 
-- **Autenticação** — Supabase Auth com OTP por email.
-  O proxy (`src/proxy.ts`) protege as rotas privadas e renova a sessão.
-- **Armazenamento de ficheiros** — Os ficheiros são carregados para o bucket
-  `materials` do Supabase Storage, em `<user_id>/<uuid>-<ficheiro>`. A base de
-  dados guarda apenas metadados (`storage_path` + URL pública).
-- **Fluxo de revisão** — `materials.review_status` ∈ `pending | approved | rejected`.
-  Os uploads de estudantes entram como `pending`; os de administradores como
-  `approved`. Só materiais aprovados (ou os teus, se ainda não o estiverem) são visíveis.
-- **Pré-visualizações** — ficheiros de imagem são mostrados diretamente pela URL
-  pública do bucket; os restantes tipos usam um fallback visual com a cor do tipo.
+![Diagrama de arquitetura do NEEI-Box](docs/architecture.png)
 
-### Modelo de dados
+A aplicação é um **monólito Next.js 16 auto-hospedado**: uma única imagem Docker
+(não é preciso um SaaS por trás) que serve a UI e expõe a API, ligado a três
+recursos externos — **PostgreSQL** (dados), **disco local persistente**
+(ficheiros) e **SMTP** (envio dos códigos OTP).
 
-```
-profiles (id, role[STUDENT|ADMIN])
-courses  (id, name, year, semester, created_at)
-materials(id, course_id → courses, title, description,
-          storage_path, web_url, file_name, review_status,
-          uploaded_by → profiles, created_at)
-```
+1. **Proxy (`src/proxy.ts`)** — antigo *middleware*, agora `proxy` no Next 16.
+   Faz um *gate* grosseiro: sem cookie de sessão, bloqueia `/api/*` privado
+   (401) e redireciona `/courses` e `/admin` para `/login`. Rotas públicas
+   (`/api/health`, `/api/auth/*`) estão fora do matcher.
+2. **Route Handlers** — a API REST real (auth, courses, materials, admin). Cada
+   rota sensível valida a sessão **e o role** no servidor (nunca se confia no
+   cliente).
+3. **Server Components + Clients** — UI com App Router, layout partilhado no
+   route group `(ui)`, estados locais geridos com `useState`/`useMemo`.
+4. **`lib/auth`** — OTP, sessões e envio de email (nodemailer).
+5. **`lib/storage`** — guarda ficheiros em disco com caminhos sanitizados e
+   limites de tamanho; serve via `/api/files/...` com cache imutável de 1 ano.
+6. **`lib/db`** (Prisma) — singleton `PrismaClient`, a única fonte de verdade
+   do schema, sincronizado via `prisma db push` no arranque do contentor.
+7. **CI → Coolify** — GitHub Actions valida (format + lint + build) em cada
+   push/PR; o Coolify faz o build multi-stage e o deploy, com `HEALTHCHECK`
+   contra `/api/health`.
 
-O diagrama ER está em [`docs/er.drawio`](docs/er.drawio).
+---
 
-## Começar a desenvolver
+## Decisões de arquitetura
 
-Pré-requisitos: **Node.js 20+** e uma conta em **Supabase**.
+Documentámos cada decisão grande como um **ADR** (Architecture Decision Record)
+— o **contexto**, a **decisão**, porque **funciona** e o **trade-off**. Isto é
+isto que permite evoluir com confiança e voltar atrás sem adivinhar.
 
-```bash
-cd src
-npm install
-cp .env.example .env.local   # preenche com as tuas credenciais
-npm run dev
-```
+### 1. Auto-hospedado (Coolify + Docker) em vez de SaaS
+- **Contexto:** o projeto começou com Supabase (auth + Postgres + Storage) e Vercel.
+- **Decisão:** migrar para auto-hospedagem — Docker multi-stage (`node:22-alpine`,
+  `output: 'standalone'`), PostgreSQL gerido no Coolify, volume persistente.
+- **Porquê funciona:** custo previsível, dados e ficheiros sob controlo do NEEI,
+  zero lock-in comercial, deploy repetível e auditável.
+- **Trade-off:** a equipa é responsável por operações (backups, atualizações);
+  mitigámos com um único binário Prisma na imagem e schema aplicado no arranque.
 
-Abre [http://localhost:3000](http://localhost:3000).
+### 2. Monólito Next.js (UI + API no mesmo deploy)
+- **Decisão:** uma só aplicação com server components e route handlers.
+- **Porquê funciona:** um único deploy, ~zero latência rede entre UI/API,
+  autorização reutilizável no servidor, rastreabilidade total.
+- **Trade-off:** escala vertical; mais que suficiente para uma comunidade
+  universitária. Extrair services só se fizer sentido quando houver métricas.
 
-### Variáveis de ambiente
+### 3. Autenticação sem palavras-passe (OTP por email institucional)
+- **Decisão:** código OTP de 6 dígitos enviado por SMTP, restrito a
+  `aNNNNN@ualg.pt` (ou `ADMIN_EMAILS`).
+- **Porquê funciona:** sem gestão de palavras-passe, sem hashing de credenciais,
+  só estudantes com email institucional entram; emissão é imediata.
+- **Trade-off:** depende do SMTP; com TTL de 10 min, máx. 5 tentativas e
+  token de uso único armazenado apenas com SHA-256, o risco é controlado.
+  (Sem *rate limiting* ao reenviar — limitação conhecida, ver abaixo.)
 
-| Variável | Descrição |
-| --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave anónima (pública) do Supabase. |
+### 4. Sessões opacas (não JWT)
+- **Decisão:** `crypto.randomBytes(32)` → token aleatório; só o hash SHA-256 fica
+  na BD (`sessions.token_hash`); cookie `neei_box_session` `httpOnly`,
+  `sameSite=lax`, `secure` em produção, expiração de 30 dias.
+- **Porquê funciona:** token mais simples e revogável — eliminar a linha do
+  cookie termina a sessão instantaneamente, sem listas negras JWT.
+- **Trade-off:** uma lookup à BD por pedido autenticado; desprezável aqui.
 
-### Configuração do Supabase
+### 5. Autorização no servidor, proxy como portão grosseiro
+- **Decisão:** o proxy só verifica a existência do cookie; cada route handler
+  chama `getCurrentUser()` e valida `role`.
+- **Porquê funciona:** "nunca confiar no cliente" — nem a presença do cookie
+  nem o UI esconder botões fazem autorização. RLS no Postgres não é necessário
+  porque a autorização é centralizada nas rotas.
+- **Trade-off:** o proxy não conhece roles; redireciona e a rota responde 403.
+  Simples e seguro.
 
-1. Cria as tabelas `profiles`, `courses` e `materials` (ver `docs/er.drawio`).
-2. Configura **Authentication → Email → Enable Email signup** e, em
-   **Authentication → Emails → Templates → Magic Link**, substitui
-   `{{ .ConfirmationURL }}` por `{{ .Token }}` — é isto que faz o Supabase
-   enviar o código em vez de um *magic link* (o comprimento do código é
-   configurável em **Authentication → Sign In / Providers → Email → Email OTP
-   length**; o cliente aceita 6–10 dígitos).
-3. Configura **Storage** (ficheiros dos materiais):
-   - Cria o bucket `materials` com **public access** (Storage → New bucket);
-   - Executa no **SQL Editor**:
-     - [`supabase/migrations/20260807_switch_onedrive_to_supabase_storage.sql`](supabase/migrations/20260807_switch_onedrive_to_supabase_storage.sql)
-       — cria o bucket, renomeia a coluna `onedrive_item_id` para `storage_path`
-       e aplica as políticas RLS do storage (upload apenas para a pasta própria
-       de cada utilizador; eliminação apenas por administradores);
-     - [`supabase/migrations/20260807_add_materials_file_name.sql`](supabase/migrations/20260807_add_materials_file_name.sql)
-       — adiciona a coluna `file_name` com o nome original do ficheiro
-       (o nome no bucket é sanitizado porque o Supabase Storage só aceita
-       caracteres S3-safe — acentos e espaços são substituídos).
-4. Executa também
-   [`supabase/migrations/20260807_rls_table_policies.sql`](supabase/migrations/20260807_rls_table_policies.sql)
-   no **SQL Editor** — sem estas políticas RLS, os uploads falham com
-   *"new row violates row-level security policy for table 'materials'"*:
-   submissão de materiais para qualquer autenticado (sempre com
-   `uploaded_by = auth.uid()`), escrita de UCs e revisão/eliminação de
-   materiais apenas por administradores.
+### 6. PostgreSQL + Prisma como fonte de verdade
+- **Decisão:** schema declarativo (`schema.prisma`), migração no arranque com
+  `prisma db push --skip-generate`, tipos gerados consumidos em toda a app.
+- **Porquê funciona:** zero SQL manual espalhado, tipos ligados ao schema
+  (TS estrito), tabelas auto-criadas em dev e produção.
+- **Trade-off:** abrir mão de controlo fino de migrações versionadas; para a
+  dimensão do projeto é a escolha pragmática e consistente.
 
-### Scripts
+### 7. Ficheiros em disco local (volume persistente)
+- **Decisão:** `UPLOAD_DIR` no contentor, caminho `<user_id>/<uuid>-<ficheiro>`,
+  nomes sanitizados (NFD), limites de 50 MB/ficheiro e 8 GB no total; serve com
+  cache `immutable`, 1 ano.
+- **Porquê funciona:** barato, zero dependências externas, pré-visualizações via
+  `/api/files/...` protegidas por sessão.
+- **Trade-off:** o armazenamento vive na máquina; o volume persistente do
+  Coolify resolve reinícios. (Limitação: o ficheiro é lido para memória na rota
+  — sem *streaming*/Range. Próximo passo natural: `fs.createReadStream`.)
 
-```bash
-npm run dev          # servidor de desenvolvimento
-npm run build        # build de produção
-npm run start        # servidor de produção
-npm run lint         # ESLint
-npm run format:check # Prettier (verificação)
-npm run format:write # Prettier (correção automática)
-```
+### 8. "Description como etiquetas" sem tabela própria
+- **Decisão:** a `description` é interpretada como um conjunto de etiquetas
+  separadas por `/`, `,` ou `;` (deduplicadas ignorando maiúsculas e acentos);
+  filtro por etiqueta em cada UC; o upload escolhe apenas etiquetas existentes.
+- **Porquê funciona:** zero migração de schema, máxima simplicidade para
+  "etiquetar", e o formulário por *chips* evita inventar tags novas. Foi uma
+  decisão de produto rápida com efeito imediato.
+- **Trade-off:** nenhuma relação N:M dedicada; se etiquetas precisarem de
+  metadados (cor, autor) evolui-se para `tags` + `material_tags` numa migração.
 
-A CI (GitHub Actions) corre lint + Prettier + build em cada push/PR.
+### 9. Dark/light mode "hand-rolled" (sem biblioteca)
+- **Decisão:** script inline FOUC-free no layout, `localStorage` +
+  `prefers-color-scheme`, `useSyncExternalStore` + `MutationObserver`.
+- **Porquê funciona:** ~120 linhas, zero dependências, sem *flash* de tema.
+  ESLint (regra `set-state-in-effect`) pegou uma armadilha e obrigou à
+  versão correta.
+- **Trade-off:** mais código nosso para manter; em troca, transparência total.
+
+### 10. Qualidade: escala de PRs + CI desde o início
+- **Decisão:** cada funcionalidade entra por **branch + PR**, com a CI
+  (GitHub Actions: `format:check` → `lint` → `build`) a validar tudo, e o
+  owner do projeto faz o merge.
+- **Porquê funciona:** `main` está sempre verde e desdobrável; decisões
+  levam registro no git; o ESLint com regras `react-hooks` estritas
+  (ex. `set-state-in-effect`, `error-boundaries`) apanhou bugs reais antes do
+  deploy. Foi o processo que permitiu mergir auth, agrupamento de UCs, tema e
+  etiquetas sem regressões.
+
+---
+
+## Segurança
+
+- **Passwordless** — sem palavras-passe, sem hashing de credenciais.
+- **OTP sólido** — 6 dígitos, TTL de 10 min, máx. 5 tentativas (bloqueia e
+  pede novo código), uso único, apenas SHA-256 persistido, emails restritos.
+- **Sessões** — token opaco de 32 bytes, hash na BD, cookie `httpOnly` +
+  `sameSite=lax` + `secure` em produção, 30 dias de duração, revogável.
+- **Autorização no servidor** — `getCurrentUser()` + verificação de role em
+  cada rota sensível; o proxy é só um portão de primeira linha.
+- **Uploads seguros** — caminhos sanitizados com `getSafePath` (bloqueia
+  *path traversal*), limites de tamanho, nomes de ficheiro neutralizados.
+- **Admin protegido** — não podes demitir-te a ti próprio nem demitir o
+  último administrador; promoção de admins é uma ação explícita por email.
+- **Public endpoints mínimos** — `/api/health` e `/api/auth/*` fora do gate;
+  tudo o resto exige sessão.
+
+---
+
+## API
+
+Todas as rotas em `src/app/api/`. Rotas sensíveis respondem `401` (sem sessão)
+ou `403` (sem role de admin).
+
+| Rota | Método | Descrição | Auth |
+| --- | --- | --- | --- |
+| `/api/health` | GET | `{ status: 'ok' }` — alvo do Docker `HEALTHCHECK` | pública |
+| `/api/auth/login` | POST | Valida o email e envia o código OTP (SMTP) | pública |
+| `/api/auth/verify` | POST | Verifica o código, cria perfil e sessão | pública |
+| `/api/auth/logout` | POST | Termina a sessão e limpa o cookie | pública¹ |
+| `/api/courses` | GET/POST | Listar UCs / criar UC | sessão (+admin p/ POST) |
+| `/api/courses/[id]` | PATCH/DELETE | Editar / apagar UC (apaga ficheiros associados) | admin |
+| `/api/materials/upload` | POST | Upload multipart (título, etiquetas, ficheiro) | sessão |
+| `/api/materials/[id]` | DELETE | Apagar material (e ficheiro do disco) | admin |
+| `/api/materials/[id]/review` | POST | Aprovar ou rejeitar (rejeitar apaga ficheiro+registo) | admin |
+| `/api/files/[...path]` | GET | Serve o ficheiro com MIME e cache imutável | sessão |
+| `/api/admin/users` | GET/POST | Listar / adicionar utilizadores | admin |
+| `/api/admin/users/[id]` | PATCH | Alterar role (com guardas anti-demissão/último admin) | admin |
+
+¹ O handler destrói a sessão e devolve sempre, mesmo sem cookie.
+
+---
+
+## Modelo de dados
+
+`docs/er.drawio.png` · [editável `docs/er.drawio`](docs/er.drawio) — notação *crow's foot*.
+
+![Diagrama Entidade-Relacionamento do NEEI-Box](docs/er.drawio.png)
+
+| Tabela | Papel | Campos-chave |
+| --- | --- | --- |
+| `profiles` | utilizadores | `id` (PK), `email` (UNIQUE), `role` (STUDENT\|ADMIN), `created_at` |
+| `courses` | UCs do curso | `id` (PK), `name`, `year`, `semester`, `created_at` |
+| `materials` | materiais partilhados | `id` (PK), `course_id` (FK), `title`, `description` (etiquetas), `storage_path`, `web_url`, `file_*`, `review_status`, `uploaded_by` (FK), `created_at` |
+| `sessions` | sessões de login | `id` (PK), `user_id` (FK), `token_hash` (UNIQUE), `expires_at` |
+| `otp_tokens` | códigos OTP | `id` (PK), `email` (IDX), `token_hash`, `expires_at`, `attempts`, `created_at` |
+
+Relações 1—* (cascata `ON DELETE`): `profiles → materials` (upload),
+`courses → materials`, `profiles → sessions`. `otp_tokens` referencia utilizador
+apenas por `email` (sem FK — requisitos transitórios do login). O schema vive em
+`src/prisma/schema.prisma`.
+
+---
+
+## Pontos fortes do projeto
+
+**Para quem usa (estudantes e NEEI):**
+- Zero palavras-passe — login com o email institucional em segundos.
+- Conteúdo com curadoria — o fluxo de revisão mantém a qualidade e bloqueia spam.
+- Organização por **ano/semestre** e **etiquetas por UC** — encontrar material é rápido.
+- Tema claro/escuro e interface 100% móvel.
+
+**Para quem desenvolve:**
+- **TypeScript estrito** em toda a app; tipos de BD gerados do schema Prisma.
+- **Segurança por desenho** — nunca confiar no cliente; tudo validado no servidor.
+- **Qualidade automática** — Prettier + ESLint (rules `react-hooks` estritas) + build na CI.
+- **Processo de equipa** — PRs com registo claro no git, `main` sempre deployável.
+- **Acessibilidade** — labels, `aria-pressed`/`aria-labelledby`, `role="dialog"`,
+  HTML semântico, `lang="pt"`.
+- **Desempenho** — Server Components, cache imutável para ficheiros,
+  build standalone com tamanho mínimo, sem dependências de tema/auth na UI.
+
+**Para empregadores:**
+- Um produto real em produção, usado por dezenas de pessoas — decisões
+  documentadas como ADRs, diagramas de arquitetura e ER, e um pipeline de
+  CI/CD funcional. Prova de boas práticas: versão controlada, revisão por PR,
+  lint/format no pipeline, segurança por camadas e transparência sobre
+  trade-offs e limitações.
+
+> **Limitações conhecidas (e próximos passos honestos):** a rota
+> `/api/files/...` lê o ficheiro para memória (sem *streaming*/Range) ·
+> `review_status` é `String` em vez de enum Prisma · falta *rate limiting* no
+> reenvio de OTP · o esquema é propagado com `prisma db push` (sem pastas de
+> migrações versionadas).
+
+---
 
 ## Estrutura do projeto
 
 ```
-src/
-├── app/
-│   ├── (ui)/               # páginas com layout partilhado
-│   │   ├── page.tsx        # landing page
-│   │   ├── login/          # entrada com código OTP
-│   │   ├── courses/        # catálogo de UCs + materiais
-│   │   └── admin/          # painel de administração
-│   └── api/
-│       ├── auth/login      # POST — envia o código OTP por email
-│       ├── auth/verify     # POST — valida o código e inicia a sessão
-│       ├── auth/logout     # POST — termina a sessão
-│       └── materials/      # upload, review, delete, thumbnail
-├── components/             # Header, Footer, MaterialPreview…
-├── lib/
-│   ├── supabase/           # clientes server/browser + storage
-│   ├── file-types.ts       # deteção de tipo de ficheiro
-│   └── types.ts            # tipos partilhados
-├── proxy.ts                # middleware (proteção de rotas + sessão)
-└── .env.example
+NEEI-Box/
+├── .github/workflows/ci.yml      # CI: format:check → lint → build
+├── Dockerfile                    # multi-stage, node:22-alpine, standalone
+├── COOLIFY.md                    # guia de deploy operacional
+├── dev.bat / dev.ps1             # lançadores de dev (Windows)
+├── docs/
+│   ├── architecture.drawio/.png  # diagrama de arquitetura
+│   ├── er.drawio/.png            # diagrama ER (crow's foot)
+│   └── DEPLOYMENT.md             # guia de deploy em produção
+├── package.json                  # wrapper que delega para src/
+├── src/                          # a aplicação Next.js
+│   ├── app/
+│   │   ├── (ui)/                 # landing, login, courses, admin (layout partilhado)
+│   │   └── api/                  # route handlers (auth, courses, materials, files, admin)
+│   ├── components/               # Header, Footer, ThemeToggle, MaterialPreview, TagPills
+│   ├── lib/
+│   │   ├── auth/                 # otp.ts · session.ts · email.ts
+│   │   ├── db.ts                 # singleton PrismaClient
+│   │   ├── storage.ts            # disco local + limites + getSafePath
+│   │   ├── file-types.ts         # deteção/tipos de ficheiro
+│   │   ├── tags.ts               # parse de etiquetas (description)
+│   │   └── types.ts              # tipos partilhados
+│   ├── prisma/schema.prisma      # fonte de verdade da BD
+│   ├── proxy.ts                  # auth gate (Next 16 "middleware")
+│   └── .env.example
+└── LICENSE                       # MIT
 ```
 
-## Pontos fortes do projeto
+---
 
-- **Sem palavras-passe** — o código OTP enviado para o email
-  institucional é simples, seguro e garante que só estudantes da UAlg entram.
-- **Tudo dentro do Supabase** — autenticação, base de dados e ficheiros no mesmo
-  projeto: menos serviços externos, uma única fonte de verdade.
-- **Controlo de qualidade** — o fluxo de revisão evita spam e conteúdos
-  inadequados antes de chegarem à comunidade.
-- **Server components + route handlers** — dados sensíveis (roles, estados)
-  são verificados no servidor; os clientes nunca recebem privilégios por omissão.
-- **API protegida por sessão e por role** — aprovar/rejeitar/eliminar exige
-  sessão válida *e* role `ADMIN` verificada no servidor.
-- **Armazenamento seguro por políticas** — o upload é restrito à pasta própria
-  de cada utilizador (RLS no `storage.objects`) e a eliminação é só de admins.
-- **Pré-visualizações simples** — imagens servidas diretamente do bucket
-  público, com fallback estilizado por tipo de ficheiro.
-- **DX e qualidade** — TypeScript estrito, ESLint, Prettier e CI que valida
-  lint + formatação + build em cada alteração.
+## Desenvolvimento local
 
-## O que aprendemos
-
-- **Supabase Storage na prática** — buckets públicos vs. privados, caminhos
-  com prefixo do utilizador, políticas RLS no `storage.objects` e URLs públicas
-  para pré-visualizações.
-- **Autenticação sem palavras-passe** — OTP por email com Supabase
-  (`signInWithOtp` + `verifyOtp`), com a sessão renovada no middleware.
-- **App Router do Next.js (16)** — server/client components, route handlers,
-  route groups (`(ui)`) e o novo middleware (`proxy.ts`).
-- **Design systems com Tailwind v4** — tokens de cor derivados da identidade
-  do NEEI, dark mode por `prefers-color-scheme` e responsividade mobile-first.
-- **Segurança por defeito** — nunca confiar no cliente para autorização:
-  cada rota sensível valida a sessão e o role no servidor.
-
-## Deploy no Vercel
-
-Guia passo-a-passo completo em **[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)**.
-Resumo:
+Pré-requisitos: **Node.js 20+**, **Docker** (para o PostgreSQL local) ou uma BD
+PostgreSQL já a correr.
 
 ```bash
-git push origin main   # 1. sobe o código
-vercel deploy          # 2. ou importa o repo em vercel.com
+cd src
+npm install
+cp .env.example .env.local        # preenche DATABASE_URL e demais variáveis
+
+# opcional: PostgreSQL local num contentor
+docker run -d --name neei-box-db -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=neei_box -p 5432:5432 postgres:16
+
+npm run dev                       # http://localhost:3000
 ```
 
-3. Define as variáveis de ambiente em **Project → Settings → Environment Variables**.
-4. Em **Authentication → Emails → Templates → Magic Link**, substitui
-   `{{ .ConfirmationURL }}` por `{{ .Token }}` para o Supabase enviar o código
-   de acesso (sem isto, o email continua a conter um link em vez do código).
-5. `vercel --prod`
+O schema é sincronizado no arranque (se `DATABASE_URL` estiver definida) ou podes
+forçar com `npx prisma db push`.
 
-> O repositório está em `src/` — na Vercel, escolhe **Root Directory: `src`**.
+### Variáveis de ambiente
+
+`src/.env.example` é o contrato de configuração:
+
+| Variável | Descrição |
+| --- | --- |
+| `DATABASE_URL` | Ligação PostgreSQL (ex. `postgresql://postgres:postgres@localhost:5432/neei_box?schema=public`) |
+| `UPLOAD_DIR` | Pasta dos ficheiros (dev: `uploads`) |
+| `MAX_FILE_SIZE_MB` | Tamanho máximo por ficheiro (padrão `50`) |
+| `MAX_STORAGE_LIMIT_GB` | Limite total do armazenamento (padrão `8`) |
+| `SMTP_HOST` / `SMTP_PORT` | Servidor SMTP (padrão `587`) |
+| `SMTP_USER` / `SMTP_PASS` | Credenciais de envio |
+| `SMTP_FROM` | Remetente (padrão `NEEI-Box <no-reply@neei.online>`) |
+| `ADMIN_EMAILS` | Emails de administradores iniciais, separados por vírgula |
+
+> Em dev, se o SMTP não estiver configurado, o código OTP é impresso no
+> terminal (`[AUTH-DEV]`) para testar o login.
+
+---
+
+## Qualidade e CI
+
+```bash
+npm run dev          # servidor de desenvolvimento
+npm run lint         # ESLint (inclui regras react-hooks estritas)
+npm run format:check # Prettier (verificação)
+npm run format:write # Prettier (correção automática)
+npm run build        # build de produção
+```
+
+A CI (**GitHub Actions**) corre `format:check` → `lint` → `build` em cada push e
+PR. `main` está sempre verde e pronta a desdobrar.
+
+---
+
+## Deploy em produção
+
+O NEEI-Box corre self-hosted no **Coolify**:
+
+- **Uma imagem Docker** (`node:22-alpine`, multi-stage, `output: standalone`)
+  com `HEALTHCHECK` contra `/api/health` e `prisma db push` no arranque.
+- **PostgreSQL** gerido no Coolify (a app liga-se via `DATABASE_URL` interna).
+- **Volume persistente** montado em `/app/uploads` para os ficheiros.
+- **Cada `git push`/PR para `main`** dispara a CI; o Coolify faz o deploy.
+
+Guia detalhado: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) e
+[`COOLIFY.md`](COOLIFY.md).
+
+---
+
+## Como o projeto evoluiu (decisões sequenciais)
+
+1. **Época OneDrive** → os ficheiros viviam em pastas partilhadas do OneDrive;
+   a BD guardava os seus IDs.
+2. **Supabase** → migrate para Supabase Auth + Postgres + Storage (bucket
+   `materials`, RLS) com deploy na Vercel.
+3. **Auto-hospedagem total** → substituir o Supabase por PostgreSQL + Prisma,
+   OTP próprio com nodemailer, ficheiros em disco local e deploy no Coolify —
+   eliminando serviços externos e lock-in.
+4. **Produto** → upload em volume de >500 materiais em 29 UCs; auth-gate
+   (PR #14), agrupamento de UCs por ano/semestre (PR #15), light/dark mode
+   (PR #16), **description→etiquetas** com filtro (PR #17) e seletor de
+   etiquetas no upload (PR #18). Cada passo: branch, PR, CI verde, merge.
+
+---
 
 ## Ideias futuras
 
-- Estatísticas de downloads e materiais mais populares
-- Perfil do estudante com o histórico das suas submissões
-- Notificação por email aos administradores quando há novos pendentes
-- Filtros avançados (palavras-chave, autor, formato de ficheiro)
+- *Streaming* e suporte a *Range* na rota de ficheiros (`createReadStream`).
+- Migrações versionadas do Prisma e enum para `review_status`.
+- *Rate limiting* e cooldown no reenvio de códigos OTP.
+- Estatísticas de downloads, materiais populares e perfil do estudante.
+- Notificações por email aos admins quando há novos pendentes.
+- Filtros avançados (formato, autor, ordenação) e pesquisa global.
+- Backups automáticos da BD e do volume de uploads.
+
+---
 
 ## Licença
 
 MIT — ver [`LICENSE`](LICENSE).
+
+**NEEI-Box** © 2026 NEEI — Núcleo de Estudantes de Engenharia Informática da
+Universidade do Algarve.

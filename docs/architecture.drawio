@@ -1,0 +1,84 @@
+<mxfile host="Electron">
+  <diagram name="Arquitetura" id="NEI-Box-Arch-2026">
+    <mxGraphModel dx="1220" dy="840" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1220" pageHeight="840" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Browser -->
+        <mxCell id="browser" value="Utilizador — Browser" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;fillColor=#E0F2FE;strokeColor=#0284C7;fontColor=#0C4A6E;" vertex="1" parent="1">
+          <mxGeometry x="500" y="30" width="220" height="56" as="geometry" />
+        </mxCell>
+
+        <!-- Next.js container -->
+        <mxCell id="app" value="Aplica&#231;&#227;o Next.js 16 — self-hosted (Node 22 + Docker)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fontSize=15;fontStyle=1;verticalAlign=top;fillColor=#F8FAFC;strokeColor=#94A3B8;dashed=1;fontColor=#334155;spacingTop=8;align=center;" vertex="1" parent="1">
+          <mxGeometry x="420" y="150" width="440" height="230" as="geometry" />
+        </mxCell>
+
+        <mxCell id="proxy" value="proxy.ts — auth gate&#10;(&#8220;middleware&#8221; de rotas privadas)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FEF3C7;strokeColor=#D97706;fontColor=#78350F;" vertex="1" parent="1">
+          <mxGeometry x="446" y="200" width="182" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="api" value="Route Handlers — API REST&#10;(auth · courses · materials · admin)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=12;fillColor=#FBCFE8;strokeColor=#DB2777;fontColor=#831843;" vertex="1" parent="1">
+          <mxGeometry x="650" y="200" width="186" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="ui" value="Server Components — UI&#10;(App Router · Tailwind v4)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=12;fillColor=#BDD8FD;strokeColor=#2563EB;fontColor=#1E3A8A;" vertex="1" parent="1">
+          <mxGeometry x="446" y="290" width="182" height="52" as="geometry" />
+        </mxCell>
+        <mxCell id="storage" value="lib/storage — ficheiros em disco&#10;(sanitiza&#231;&#227;o + limites de tamanho)" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontSize=12;fillColor=#D9F99D;strokeColor=#65A30D;fontColor=#3F6212;" vertex="1" parent="1">
+          <mxGeometry x="650" y="290" width="186" height="52" as="geometry" />
+        </mxCell>
+
+        <!-- PostgreSQL -->
+        <mxCell id="pg" value="PostgreSQL (Coolify managed)&#10;profiles · courses · materials&#10;sessions · otp_tokens" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;fillColor=#1E3A8A;strokeColor=#1E3A8A;fontColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="70" y="210" width="250" height="92" as="geometry" />
+        </mxCell>
+
+        <!-- Local disk -->
+        <mxCell id="disk" value="Volume persistente — /app/uploads&#10;&lt;user_id&gt;/&lt;uuid&gt;-&lt;ficheiro&gt;&#10;(m&#225;x. 8 GB total · 50 MB por ficheiro)" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontSize=11;fillColor=#FFEDD5;strokeColor=#EA580C;fontColor=#7C2D12;" vertex="1" parent="1">
+          <mxGeometry x="70" y="380" width="250" height="82" as="geometry" />
+        </mxCell>
+
+        <!-- SMTP -->
+        <mxCell id="smtp" value="SMTP — envio do c&#243;digo OTP&#10;(nodemailer)" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fontSize=12;fontStyle=1;fillColor=#CFFAFE;strokeColor=#0891B2;fontColor=#164E63;" vertex="1" parent="1">
+          <mxGeometry x="900" y="210" width="240" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- CI -->
+        <mxCell id="ci" value="GitHub Actions — CI&#10;Prettier · ESLint · next build" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;fillColor=#ECFCCB;strokeColor=#4D7C0F;fontColor=#365314;" vertex="1" parent="1">
+          <mxGeometry x="70" y="620" width="270" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Coolify -->
+        <mxCell id="coolify" value="Coolify — deploy &amp; HEALTHCHECK&#10;Dockerfile multi-stage · prisma db push no start" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fontSize=13;fontStyle=1;fillColor=#EDE9FE;strokeColor=#6D28D9;fontColor=#4C1D95;" vertex="1" parent="1">
+          <mxGeometry x="430" y="620" width="340" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Stack note -->
+        <mxCell id="note" value="Stack: Next.js 16 · React 19 · TypeScript (estrito) · Tailwind CSS v4 · Prisma 6 · PostgreSQL · Node 22" style="rounded=1;arcSize=14;whiteSpace=wrap;html=1;fontSize=11;fillColor=#FFFFFF;strokeColor=#CBD5E1;fontColor=#475569;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="620" width="320" height="44" as="geometry" />
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e-browser-app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=11;fontColor=#475569;labelBackgroundColor=#FFFFFF;endArrow=block;" edge="1" parent="1" source="browser" target="app" value="HTTPS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-app-pg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=0.55;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;fontColor=#475569;labelBackgroundColor=#FFFFFF;endArrow=block;" edge="1" parent="1" source="app" target="pg" value="Prisma (SQL)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-app-disk" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=11;fontColor=#475569;labelBackgroundColor=#FFFFFF;endArrow=block;" edge="1" parent="1" source="app" target="disk" value="upload / download">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-app-smtp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.55;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;fontColor=#475569;labelBackgroundColor=#FFFFFF;endArrow=block;" edge="1" parent="1" source="app" target="smtp" value="nodemailer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-ci-coolify" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=11;fontColor=#475569;labelBackgroundColor=#FFFFFF;endArrow=block;" edge="1" parent="1" source="ci" target="coolify" value="push / PR">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e-coolify-app" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=11;fontColor=#475569;labelBackgroundColor=#FFFFFF;startArrow=block;" edge="1" parent="1" source="coolify" target="app" value="deploy">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
