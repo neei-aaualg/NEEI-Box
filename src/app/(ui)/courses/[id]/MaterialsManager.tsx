@@ -4,11 +4,13 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import MaterialPreview from '@/components/MaterialPreview';
+import TagPills from '@/components/TagPills';
 import {
   getFileType,
   getFileTypeMeta,
   sanitizeFileName,
 } from '@/lib/file-types';
+import { materialHasTag, parseTags, tagKey } from '@/lib/tags';
 import type { Course, Material, MaterialStatus } from '@/lib/types';
 
 interface Props {
@@ -84,6 +86,7 @@ export default function MaterialsManager({
 
   const [materials, setMaterials] = useState<Material[]>(initialMaterials);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [deletingMaterial, setDeletingMaterial] = useState<Material | null>(
@@ -97,15 +100,46 @@ export default function MaterialsManager({
   const [uploading, setUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const visibleMaterials = useMemo(() => {
+  const statusVisibleMaterials = useMemo(() => {
     return materials.filter((material) => {
       if (!isAdmin && material.review_status !== 'approved') return false;
       if (statusFilter !== 'all' && material.review_status !== statusFilter)
         return false;
 
+      return true;
+    });
+  }, [materials, statusFilter, isAdmin]);
+
+  const availableTags = useMemo(() => {
+    const counts = new Map<string, { label: string; count: number }>();
+    for (const material of statusVisibleMaterials) {
+      for (const tag of parseTags(material.description)) {
+        const key = tagKey(tag);
+        const entry = counts.get(key);
+        if (entry) {
+          entry.count += 1;
+        } else {
+          counts.set(key, { label: tag, count: 1 });
+        }
+      }
+    }
+
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1].count - a[1].count || a[0].localeCompare(b[0]))
+      .map(([key, value]) => ({ key, ...value }));
+  }, [statusVisibleMaterials]);
+
+  const visibleMaterials = useMemo(() => {
+    return statusVisibleMaterials.filter((material) => {
+      if (selectedTag && !materialHasTag(material, selectedTag)) return false;
+
       return material.title.toLowerCase().includes(searchQuery.toLowerCase());
     });
-  }, [materials, statusFilter, searchQuery, isAdmin]);
+  }, [statusVisibleMaterials, selectedTag, searchQuery]);
+
+  const handleTagSelect = (key: string) => {
+    setSelectedTag((prev) => (prev === key ? null : key));
+  };
 
   const counts = useMemo(() => {
     const count = (status: StatusFilter) =>
@@ -365,13 +399,96 @@ export default function MaterialsManager({
         </div>
       </div>
 
+      {/* Filtro por Etiquetas */}
+      {availableTags.length > 0 && (
+        <div className="mb-6">
+          <div
+            className="flex flex-wrap items-center gap-2"
+            role="group"
+            aria-label="Filtrar materiais por etiqueta"
+          >
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+              <svg
+                aria-hidden="true"
+                className="h-3.5 w-3.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"
+                />
+              </svg>
+              Etiquetas
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => setSelectedTag(null)}
+                aria-pressed={selectedTag === null}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  selectedTag === null
+                    ? 'bg-brand-900 text-white dark:bg-brand-500 dark:text-night-950'
+                    : 'bg-white text-zinc-600 ring-1 ring-zinc-200 hover:bg-zinc-100 dark:bg-night-900 dark:text-zinc-300 dark:ring-white/10 dark:hover:bg-white/5'
+                }`}
+              >
+                Todas
+                <span
+                  className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
+                    selectedTag === null
+                      ? 'bg-white/20 text-white'
+                      : 'bg-zinc-100 text-zinc-500 dark:bg-white/10 dark:text-zinc-400'
+                  }`}
+                >
+                  {statusVisibleMaterials.length}
+                </span>
+              </button>
+
+              {availableTags.map((tag) => {
+                const isSelected = selectedTag === tag.key;
+                return (
+                  <button
+                    key={tag.key}
+                    type="button"
+                    onClick={() => handleTagSelect(tag.key)}
+                    aria-pressed={isSelected}
+                    title={`Filtrar por ${tag.label}`}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                      isSelected
+                        ? 'bg-brand-900 text-white dark:bg-brand-500 dark:text-night-950'
+                        : 'bg-white text-zinc-600 ring-1 ring-zinc-200 hover:bg-zinc-100 dark:bg-night-900 dark:text-zinc-300 dark:ring-white/10 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    {tag.label}
+                    <span
+                      className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
+                        isSelected
+                          ? 'bg-white/20 text-white'
+                          : 'bg-zinc-100 text-zinc-500 dark:bg-white/10 dark:text-zinc-400'
+                      }`}
+                    >
+                      {tag.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Lista de Materiais */}
       {visibleMaterials.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-zinc-300 py-16 text-center dark:border-zinc-700">
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {statusFilter === 'all'
-              ? 'Ainda não há materiais disponíveis para esta unidade curricular.'
-              : 'Não há materiais com este estado.'}
+            {statusFilter !== 'all'
+              ? 'Não há materiais com este estado.'
+              : selectedTag || searchQuery
+                ? 'Não há materiais que correspondam aos filtros selecionados.'
+                : 'Ainda não há materiais disponíveis para esta unidade curricular.'}
           </p>
         </div>
       ) : (
@@ -399,11 +516,12 @@ export default function MaterialsManager({
                   <h2 className="font-semibold leading-snug text-zinc-900 dark:text-white">
                     {material.title}
                   </h2>
-                  {material.description && (
-                    <p className="mt-1.5 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
-                      {material.description}
-                    </p>
-                  )}
+                  <div className="mt-2">
+                    <TagPills
+                      value={material.description}
+                      onSelect={handleTagSelect}
+                    />
+                  </div>
                 </div>
 
                 <div className="mt-auto flex items-center justify-between gap-2 pt-2">
@@ -521,16 +639,20 @@ export default function MaterialsManager({
                   htmlFor="material-description"
                   className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
                 >
-                  Descrição (Opcional)
+                  Etiquetas (Opcional)
                 </label>
                 <textarea
                   id="material-description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Ex: Exercícios resolvidos e apontamentos teóricos"
-                  rows={3}
+                  placeholder="Ex: Frequências, Exame, Apontamentos"
+                  rows={2}
                   className="w-full rounded-xl border border-zinc-300 bg-white p-3 text-sm text-zinc-900 outline-none transition-shadow placeholder:text-zinc-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-night-950 dark:text-white"
                 />
+                <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                  Separa várias etiquetas com vírgulas, barras ou ponto e
+                  vírgula.
+                </p>
               </div>
 
               <div className="flex flex-col gap-1.5">
