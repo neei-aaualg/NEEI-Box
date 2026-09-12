@@ -42,7 +42,7 @@ export default function Header({ user, isAdmin }: HeaderProps) {
         <div className="flex items-center gap-6 sm:gap-8">
           <Link
             href="/"
-            className="group flex h-full items-center gap-2 rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
+            className="group flex items-center gap-2 rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
             aria-label="NEEI-Box — Início"
           >
             <Image
@@ -51,12 +51,12 @@ export default function Header({ user, isAdmin }: HeaderProps) {
               width={140}
               height={90}
               priority
-              className="h-14 w-auto object-contain sm:h-16 lg:h-[2.35rem] drop-shadow-[0_0_2.5px_rgba(34,211,238,0.25)]"
+              className="h-8 w-auto object-contain sm:h-9 lg:h-[2.35rem] drop-shadow-[0_0_2.5px_rgba(34,211,238,0.25)]"
             />
-            <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/20 bg-brand-500/10 px-2 py-0.5 text-[11px] font-semibold tracking-tight text-brand-700 backdrop-blur-xs transition-all duration-200 group-hover:border-brand-500/40 group-hover:bg-brand-500/15 group-hover:text-brand-800 dark:border-brand-400/25 dark:bg-brand-400/10 dark:text-brand-300 dark:group-hover:border-brand-400/40 dark:group-hover:bg-brand-400/15 dark:group-hover:text-brand-200">
+            <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/20 bg-brand-500/10 px-2 py-0.5 text-[10px] font-semibold tracking-tight text-brand-700 backdrop-blur-xs transition-all duration-200 group-hover:border-brand-500/40 group-hover:bg-brand-500/15 group-hover:text-brand-800 sm:text-[11px] dark:border-brand-400/25 dark:bg-brand-400/10 dark:text-brand-300 dark:group-hover:border-brand-400/40 dark:group-hover:bg-brand-400/15 dark:group-hover:text-brand-200">
               <svg
                 aria-hidden="true"
-                className="h-3 w-3 text-brand-600 transition-transform duration-200 group-hover:scale-110 dark:text-brand-400"
+                className="h-2.5 w-2.5 text-brand-600 transition-transform duration-200 group-hover:scale-110 sm:h-3 sm:w-3 dark:text-brand-400"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
