@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface HeaderProps {
   user: { email: string } | null;
@@ -94,6 +95,8 @@ export default function Header({ user, isAdmin }: HeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
+
           <a
             href="https://neei.online"
             className="group inline-flex h-9 items-center gap-1.5 rounded-full border border-zinc-200/80 bg-zinc-50/70 px-3 text-xs font-medium text-zinc-700 transition-all hover:border-brand-300 hover:bg-brand-50 hover:text-brand-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:border-brand-800 dark:hover:bg-brand-950/40 dark:hover:text-brand-200"
