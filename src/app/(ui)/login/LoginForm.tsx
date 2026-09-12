@@ -305,7 +305,7 @@ export default function LoginForm() {
           <div className="mb-8 flex items-center gap-3 lg:hidden">
             <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl ring-1 ring-zinc-900/10 dark:ring-white/10">
               <Image
-                src="/neei.svg"
+                src="/neei-logo.png"
                 alt=""
                 width={40}
                 height={40}

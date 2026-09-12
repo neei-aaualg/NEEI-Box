@@ -420,7 +420,7 @@ export default function Home() {
 
           <div className="relative rounded-3xl border border-zinc-200/80 bg-gradient-to-br from-brand-50 to-white p-8 sm:p-10 dark:border-white/10 dark:from-night-900 dark:to-night-950">
             <Image
-              src="/neei.svg"
+              src="/neei-logo.png"
               alt="Logótipo do NEEI"
               width={96}
               height={96}

@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   description:
     'A plataforma do Núcleo de Estudantes de Engenharia Informática da Universidade do Algarve para partilhar apontamentos, exames e materiais de estudo entre estudantes.',
   icons: {
-    icon: [{ url: '/neei-logo1.png' }, { url: '/favicon.ico' }],
-    apple: [{ url: '/neei-logo1.png' }],
-    shortcut: '/neei-logo1.png',
+    icon: [{ url: '/neei-logo.png' }, { url: '/favicon.ico' }],
+    apple: [{ url: '/neei-logo.png' }],
+    shortcut: '/neei-logo.png',
   },
 };
 
