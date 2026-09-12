@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import MaterialPreview from '@/components/MaterialPreview';
+import TagPills from '@/components/TagPills';
 import type { AdminUser, MaterialWithCourse } from '@/lib/types';
 
 type AdminTab = 'pending' | 'approved' | 'admins';
@@ -904,11 +905,9 @@ export default function AdminManager({
                       {material.title}
                     </h2>
 
-                    {material.description && (
-                      <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
-                        {material.description}
-                      </p>
-                    )}
+                    <div className="mt-2">
+                      <TagPills value={material.description} />
+                    </div>
 
                     <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
                       {material.review_status !== 'approved' && (
