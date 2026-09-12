@@ -81,10 +81,11 @@ export default function Header({ user, isAdmin }: HeaderProps) {
                 key={item.href}
                 href={item.href}
                 aria-current={isActive(item.href) ? 'page' : undefined}
-                className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${isActive(item.href)
-                  ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
-                  : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white'
-                  }`}
+                className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                  isActive(item.href)
+                    ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
+                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white'
+                }`}
               >
                 {item.label}
               </Link>
@@ -226,10 +227,11 @@ export default function Header({ user, isAdmin }: HeaderProps) {
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
                 aria-current={isActive(item.href) ? 'page' : undefined}
-                className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${isActive(item.href)
-                  ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
-                  : 'text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-white/5'
-                  }`}
+                className={`rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
+                  isActive(item.href)
+                    ? 'bg-brand-50 text-brand-800 dark:bg-brand-950 dark:text-brand-200'
+                    : 'text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-white/5'
+                }`}
               >
                 {item.label}
               </Link>

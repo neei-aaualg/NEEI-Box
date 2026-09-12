@@ -1,6 +1,9 @@
 import nodemailer from 'nodemailer';
 
-export async function sendOtpEmail(email: string, code: string): Promise<boolean> {
+export async function sendOtpEmail(
+  email: string,
+  code: string
+): Promise<boolean> {
   const host = process.env.SMTP_HOST;
   const port = parseInt(process.env.SMTP_PORT || '587', 10);
   const user = process.env.SMTP_USER;

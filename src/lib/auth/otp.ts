@@ -6,7 +6,9 @@ function hashOtp(code: string): string {
   return crypto.createHash('sha256').update(code.trim()).digest('hex');
 }
 
-export async function createAndSendOtp(email: string): Promise<{ success: boolean; error?: string }> {
+export async function createAndSendOtp(
+  email: string
+): Promise<{ success: boolean; error?: string }> {
   try {
     const normalizedEmail = email.trim().toLowerCase();
 
@@ -34,7 +36,8 @@ export async function createAndSendOtp(email: string): Promise<{ success: boolea
 
     return { success: true };
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Falha ao gerar o código.';
+    const message =
+      err instanceof Error ? err.message : 'Falha ao gerar o código.';
     return { success: false, error: message };
   }
 }
@@ -55,12 +58,18 @@ export async function verifyOtpCode(
     });
 
     if (!tokenRecord) {
-      return { success: false, error: 'Código expirado ou inexistente. Pede um novo.' };
+      return {
+        success: false,
+        error: 'Código expirado ou inexistente. Pede um novo.',
+      };
     }
 
     if (tokenRecord.attempts >= 5) {
       await prisma.otpToken.delete({ where: { id: tokenRecord.id } });
-      return { success: false, error: 'Demasiadas tentativas falhadas. Pede um novo código.' };
+      return {
+        success: false,
+        error: 'Demasiadas tentativas falhadas. Pede um novo código.',
+      };
     }
 
     if (tokenRecord.tokenHash !== tokenHash) {
@@ -75,7 +84,8 @@ export async function verifyOtpCode(
     await prisma.otpToken.delete({ where: { id: tokenRecord.id } });
     return { success: true };
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Falha na verificação.';
+    const message =
+      err instanceof Error ? err.message : 'Falha na verificação.';
     return { success: false, error: message };
   }
 }

@@ -11,7 +11,10 @@ export async function PATCH(request: Request, { params }: Params) {
   try {
     const currentUser = await getCurrentUser();
     if (!currentUser || currentUser.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Acesso restrito a administradores.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Acesso restrito a administradores.' },
+        { status: 403 }
+      );
     }
 
     const { id } = await params;
@@ -28,7 +31,9 @@ export async function PATCH(request: Request, { params }: Params) {
     // Protection: an admin cannot demote themselves
     if (currentUser.id === id && targetRole !== 'ADMIN') {
       return NextResponse.json(
-        { error: 'Não podes despromover o teu próprio cargo de administrador.' },
+        {
+          error: 'Não podes despromover o teu próprio cargo de administrador.',
+        },
         { status: 400 }
       );
     }
@@ -37,14 +42,22 @@ export async function PATCH(request: Request, { params }: Params) {
     if (targetRole === 'STUDENT') {
       const targetUser = await prisma.user.findUnique({ where: { id } });
       if (!targetUser) {
-        return NextResponse.json({ error: 'Utilizador não encontrado.' }, { status: 404 });
+        return NextResponse.json(
+          { error: 'Utilizador não encontrado.' },
+          { status: 404 }
+        );
       }
 
       if (targetUser.role === 'ADMIN') {
-        const adminCount = await prisma.user.count({ where: { role: 'ADMIN' } });
+        const adminCount = await prisma.user.count({
+          where: { role: 'ADMIN' },
+        });
         if (adminCount <= 1) {
           return NextResponse.json(
-            { error: 'Não podes despromover o único administrador da plataforma.' },
+            {
+              error:
+                'Não podes despromover o único administrador da plataforma.',
+            },
             { status: 400 }
           );
         }
@@ -66,7 +79,8 @@ export async function PATCH(request: Request, { params }: Params) {
       message: `Cargo de ${updated.email} atualizado para ${targetRole === 'ADMIN' ? 'Administrador' : 'Estudante'}.`,
     });
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro ao atualizar utilizador.';
+    const msg =
+      error instanceof Error ? error.message : 'Erro ao atualizar utilizador.';
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

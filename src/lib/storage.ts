@@ -7,12 +7,19 @@ const UPLOAD_DIR = process.env.UPLOAD_DIR
   : path.resolve(process.cwd(), 'uploads');
 
 // Default: 50 MB per single file
-export const MAX_FILE_SIZE_MB = parseInt(process.env.MAX_FILE_SIZE_MB || '50', 10);
+export const MAX_FILE_SIZE_MB = parseInt(
+  process.env.MAX_FILE_SIZE_MB || '50',
+  10
+);
 export const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 // Default: 8 GB maximum volume storage capacity
-export const MAX_STORAGE_LIMIT_GB = parseFloat(process.env.MAX_STORAGE_LIMIT_GB || '8');
-export const MAX_STORAGE_LIMIT_BYTES = Math.floor(MAX_STORAGE_LIMIT_GB * 1024 * 1024 * 1024);
+export const MAX_STORAGE_LIMIT_GB = parseFloat(
+  process.env.MAX_STORAGE_LIMIT_GB || '8'
+);
+export const MAX_STORAGE_LIMIT_BYTES = Math.floor(
+  MAX_STORAGE_LIMIT_GB * 1024 * 1024 * 1024
+);
 
 function getSafePath(relativePath: string): string {
   const normalized = path.normalize(relativePath).replace(/^(\.\.[\/\\])+/, '');
@@ -111,6 +118,9 @@ export async function getFileStats(relativePath: string) {
   return { fullPath, size: stats.size, mtime: stats.mtime };
 }
 
-export function getFileStream(fullPath: string, options?: { start?: number; end?: number }) {
+export function getFileStream(
+  fullPath: string,
+  options?: { start?: number; end?: number }
+) {
   return createReadStream(fullPath, options);
 }
