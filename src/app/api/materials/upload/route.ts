@@ -28,7 +28,8 @@ export async function POST(request: Request) {
     }
 
     const file = formData.get('file') as File;
-    const originalName = (formData.get('original_name') as string) || file?.name || 'material';
+    const originalName =
+      (formData.get('original_name') as string) || file?.name || 'material';
     const courseId = formData.get('course_id') as string;
     const title = formData.get('title') as string;
     const description = (formData.get('description') as string) || '';
@@ -43,7 +44,9 @@ export async function POST(request: Request) {
     // 1. Limite por ficheiro (ex: 50 MB)
     if (file.size > MAX_FILE_SIZE_BYTES) {
       return NextResponse.json(
-        { error: `O ficheiro excede o limite máximo permitido de ${MAX_FILE_SIZE_MB} MB.` },
+        {
+          error: `O ficheiro excede o limite máximo permitido de ${MAX_FILE_SIZE_MB} MB.`,
+        },
         { status: 413 }
       );
     }
@@ -52,7 +55,11 @@ export async function POST(request: Request) {
     const capacity = await checkStorageCapacity(file.size);
     if (!capacity.allowed) {
       return NextResponse.json(
-        { error: capacity.error || 'Espaço de armazenamento insuficiente no servidor.' },
+        {
+          error:
+            capacity.error ||
+            'Espaço de armazenamento insuficiente no servidor.',
+        },
         { status: 507 }
       );
     }
@@ -112,7 +119,8 @@ export async function POST(request: Request) {
         : 'Material submetido para aprovação.',
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erro interno no servidor.';
+    const message =
+      error instanceof Error ? error.message : 'Erro interno no servidor.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

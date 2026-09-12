@@ -40,4 +40,3 @@ export type AdminUser = {
   role: 'STUDENT' | 'ADMIN';
   created_at: string;
 };
-

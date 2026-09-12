@@ -136,7 +136,6 @@ export default function CoursesManager({
     }
   };
 
-
   const filteredCourses = courses.filter((course) => {
     const matchesName = course.name
       .toLowerCase()

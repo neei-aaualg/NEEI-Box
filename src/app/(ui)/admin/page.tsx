@@ -32,10 +32,7 @@ export default async function AdminPage() {
       orderBy: { createdAt: 'desc' },
     }),
     prisma.user.findMany({
-      orderBy: [
-        { role: 'asc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ role: 'asc' }, { createdAt: 'desc' }],
     }),
   ]);
 
@@ -77,4 +74,3 @@ export default async function AdminPage() {
     />
   );
 }
-

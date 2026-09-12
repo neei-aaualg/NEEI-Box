@@ -81,7 +81,8 @@ export async function POST(
       message: 'Material aprovado com sucesso.',
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erro ao processar revisão.';
+    const message =
+      error instanceof Error ? error.message : 'Erro ao processar revisão.';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

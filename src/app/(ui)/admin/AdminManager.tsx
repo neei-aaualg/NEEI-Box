@@ -78,7 +78,9 @@ export default function AdminManager({
 
   // Admin management filters & form
   const [userSearch, setUserSearch] = useState('');
-  const [userRoleFilter, setUserRoleFilter] = useState<'all' | 'ADMIN' | 'STUDENT'>('all');
+  const [userRoleFilter, setUserRoleFilter] = useState<
+    'all' | 'ADMIN' | 'STUDENT'
+  >('all');
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [isAddingAdmin, setIsAddingAdmin] = useState(false);
   const [isRefreshingUsers, setIsRefreshingUsers] = useState(false);
@@ -119,7 +121,9 @@ export default function AdminManager({
 
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
-      const matchSearch = u.email.toLowerCase().includes(userSearch.toLowerCase().trim());
+      const matchSearch = u.email
+        .toLowerCase()
+        .includes(userSearch.toLowerCase().trim());
       if (!matchSearch) return false;
       if (userRoleFilter === 'ADMIN') return u.role === 'ADMIN';
       if (userRoleFilter === 'STUDENT') return u.role === 'STUDENT';
@@ -265,13 +269,20 @@ export default function AdminManager({
     }
   };
 
-  const handleRoleChange = async (targetUser: AdminUser, newRole: 'ADMIN' | 'STUDENT') => {
+  const handleRoleChange = async (
+    targetUser: AdminUser,
+    newRole: 'ADMIN' | 'STUDENT'
+  ) => {
     if (targetUser.id === currentUserId && newRole !== 'ADMIN') {
       setNotice('Não podes despromover a tua própria conta de administrador.');
       return;
     }
 
-    if (newRole === 'STUDENT' && counts.admins <= 1 && targetUser.role === 'ADMIN') {
+    if (
+      newRole === 'STUDENT' &&
+      counts.admins <= 1 &&
+      targetUser.role === 'ADMIN'
+    ) {
       setNotice('Não podes despromover o único administrador da plataforma.');
       return;
     }
@@ -285,7 +296,8 @@ export default function AdminManager({
     );
     setCounts((prev) => ({
       ...prev,
-      admins: newRole === 'ADMIN' ? prev.admins + 1 : Math.max(0, prev.admins - 1),
+      admins:
+        newRole === 'ADMIN' ? prev.admins + 1 : Math.max(0, prev.admins - 1),
     }));
     setNotice(null);
     setActionLoading(true);
@@ -305,7 +317,10 @@ export default function AdminManager({
         setCounts(prevCounts);
         setNotice(data.error || 'Erro ao alterar cargo.');
       } else {
-        setNotice(data.message || `Permissões de ${targetUser.email} atualizadas em tempo real.`);
+        setNotice(
+          data.message ||
+            `Permissões de ${targetUser.email} atualizadas em tempo real.`
+        );
         setDemotingUser(null);
         router.refresh();
       }
@@ -354,12 +369,16 @@ export default function AdminManager({
         });
 
         setCounts((prev) => {
-          const wasAdmin = users.some((u) => u.email === cleanEmail && u.role === 'ADMIN');
+          const wasAdmin = users.some(
+            (u) => u.email === cleanEmail && u.role === 'ADMIN'
+          );
           return wasAdmin ? prev : { ...prev, admins: prev.admins + 1 };
         });
 
         setNewAdminEmail('');
-        setNotice(data.message || `Administrador ${cleanEmail} configurado com sucesso.`);
+        setNotice(
+          data.message || `Administrador ${cleanEmail} configurado com sucesso.`
+        );
         router.refresh();
       }
     } catch {
@@ -391,7 +410,9 @@ export default function AdminManager({
           Painel de Administração
         </span>
         <h1 className="mt-4 text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-white">
-          {activeTab === 'admins' ? 'Gestão de Administradores' : 'Gestão de Materiais'}
+          {activeTab === 'admins'
+            ? 'Gestão de Administradores'
+            : 'Gestão de Materiais'}
         </h1>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
           {activeTab === 'admins'
@@ -422,7 +443,11 @@ export default function AdminManager({
               strokeWidth="2"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <span>{notice}</span>
           </div>
@@ -485,7 +510,8 @@ export default function AdminManager({
                   Adicionar / Promover Administrador
                 </h2>
                 <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                  Introduz o email institucional de um membro. Terá permissões de administração imediatamente.
+                  Introduz o email institucional de um membro. Terá permissões
+                  de administração imediatamente.
                 </p>
               </div>
 
@@ -525,7 +551,10 @@ export default function AdminManager({
               </div>
             </div>
 
-            <form onSubmit={handleAddAdmin} className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <form
+              onSubmit={handleAddAdmin}
+              className="mt-4 flex flex-col gap-3 sm:flex-row"
+            >
               <div className="relative flex-1">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-zinc-400">
                   <svg
@@ -560,9 +589,24 @@ export default function AdminManager({
               >
                 {isAddingAdmin ? (
                   <>
-                    <svg className="h-3.5 w-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="h-3.5 w-3.5 animate-spin"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     A adicionar...
                   </>
@@ -576,7 +620,11 @@ export default function AdminManager({
                       strokeWidth="2"
                       viewBox="0 0 24 24"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 4.5v15m7.5-7.5h-15"
+                      />
                     </svg>
                     Tornar Administrador
                   </>
@@ -618,8 +666,18 @@ export default function AdminManager({
                   onClick={() => setUserSearch('')}
                   className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                 >
-                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="h-3.5 w-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               )}
@@ -1020,7 +1078,8 @@ export default function AdminManager({
               <span className="font-semibold text-zinc-900 dark:text-white">
                 {demotingUser.email}
               </span>
-              ? O utilizador passará a ter a função de estudante e perderá acesso a este painel em tempo real.
+              ? O utilizador passará a ter a função de estudante e perderá
+              acesso a este painel em tempo real.
             </p>
 
             <div className="flex justify-center gap-3">

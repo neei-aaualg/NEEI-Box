@@ -18,6 +18,9 @@ export default async function CoursesPage() {
 
   const isAdmin = user.role === 'ADMIN';
 
+  let normalized: Course[] = [];
+  let fetchError: string | undefined;
+
   try {
     const courses = await prisma.course.findMany({
       include: {
@@ -28,7 +31,7 @@ export default async function CoursesPage() {
       orderBy: { name: 'asc' },
     });
 
-    const normalized: Course[] = courses.map((course) => ({
+    normalized = courses.map((course) => ({
       id: course.id,
       name: course.name,
       year: course.year,
@@ -36,21 +39,18 @@ export default async function CoursesPage() {
       created_at: course.createdAt.toISOString(),
       materials_count: course._count.materials,
     }));
-
-    return (
-      <CoursesManager
-        initialCourses={normalized}
-        isAdmin={isAdmin}
-      />
-    );
   } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Erro ao carregar Unidades Curriculares.';
-    return (
-      <CoursesManager
-        initialCourses={[]}
-        isAdmin={isAdmin}
-        fetchError={msg}
-      />
-    );
+    fetchError =
+      error instanceof Error
+        ? error.message
+        : 'Erro ao carregar Unidades Curriculares.';
   }
+
+  return (
+    <CoursesManager
+      initialCourses={normalized}
+      isAdmin={isAdmin}
+      fetchError={fetchError}
+    />
+  );
 }
