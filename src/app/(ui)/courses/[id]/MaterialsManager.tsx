@@ -95,7 +95,7 @@ export default function MaterialsManager({
   const [actionLoading, setActionLoading] = useState(false);
 
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -137,8 +137,28 @@ export default function MaterialsManager({
     });
   }, [statusVisibleMaterials, selectedTag, searchQuery]);
 
+  const allCourseTags = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const material of materials) {
+      for (const tag of parseTags(material.description)) {
+        const key = tagKey(tag);
+        if (!seen.has(key)) seen.set(key, tag);
+      }
+    }
+
+    return Array.from(seen.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([key, label]) => ({ key, label }));
+  }, [materials]);
+
   const handleTagSelect = (key: string) => {
     setSelectedTag((prev) => (prev === key ? null : key));
+  };
+
+  const toggleTagSelection = (key: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(key) ? prev.filter((t) => t !== key) : [...prev, key]
+    );
   };
 
   const counts = useMemo(() => {
@@ -162,7 +182,7 @@ export default function MaterialsManager({
     }
 
     if (file.size > 50 * 1024 * 1024) {
-      setErrorMsg('O ficheiro selecionado excede o limite máximo de 4 MB.');
+      setErrorMsg('O ficheiro selecionado excede o limite máximo de 50 MB.');
       return;
     }
 
@@ -177,7 +197,7 @@ export default function MaterialsManager({
     formData.append('original_name', file.name);
     formData.append('course_id', course.id);
     formData.append('title', title);
-    formData.append('description', description);
+    formData.append('description', selectedTags.join(', '));
 
     try {
       const response = await fetch('/api/materials/upload', {
@@ -194,7 +214,7 @@ export default function MaterialsManager({
       setMaterials((prev) => [resData.material as Material, ...prev]);
       setIsUploadModalOpen(false);
       setTitle('');
-      setDescription('');
+      setSelectedTags([]);
       setFile(null);
       router.refresh();
     } catch (err) {
@@ -635,24 +655,48 @@ export default function MaterialsManager({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="material-description"
+                <span
+                  id="material-tags-label"
                   className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
                 >
                   Etiquetas (Opcional)
-                </label>
-                <textarea
-                  id="material-description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Ex: Frequências, Exame, Apontamentos"
-                  rows={2}
-                  className="w-full rounded-xl border border-zinc-300 bg-white p-3 text-sm text-zinc-900 outline-none transition-shadow placeholder:text-zinc-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-night-950 dark:text-white"
-                />
-                <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
-                  Separa várias etiquetas com vírgulas, barras ou ponto e
-                  vírgula.
-                </p>
+                </span>
+                {allCourseTags.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-zinc-300 px-3 py-3 text-xs text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+                    Ainda não há etiquetas nesta unidade curricular. Podes
+                    submeter sem etiquetas.
+                  </p>
+                ) : (
+                  <>
+                    <div
+                      role="group"
+                      aria-labelledby="material-tags-label"
+                      className="flex flex-wrap gap-1.5"
+                    >
+                      {allCourseTags.map((tag) => {
+                        const isSelected = selectedTags.includes(tag.key);
+                        return (
+                          <button
+                            key={tag.key}
+                            type="button"
+                            onClick={() => toggleTagSelection(tag.key)}
+                            aria-pressed={isSelected}
+                            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                              isSelected
+                                ? 'bg-brand-900 text-white dark:bg-brand-500 dark:text-night-950'
+                                : 'bg-white text-zinc-600 ring-1 ring-zinc-200 hover:bg-zinc-100 dark:bg-night-900 dark:text-zinc-300 dark:ring-white/10 dark:hover:bg-white/5'
+                            }`}
+                          >
+                            {tag.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                      Escolhe etiquetas já existentes nesta unidade curricular.
+                    </p>
+                  </>
+                )}
               </div>
 
               <div className="flex flex-col gap-1.5">
