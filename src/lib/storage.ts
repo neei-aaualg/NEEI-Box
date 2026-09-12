@@ -1,6 +1,9 @@
 import fs from 'fs/promises';
-import { createReadStream, existsSync } from 'fs';
+import { createReadStream, createWriteStream, existsSync } from 'fs';
 import path from 'path';
+import crypto from 'crypto';
+import { Readable, Transform } from 'stream';
+import { pipeline } from 'stream/promises';
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR
   ? path.resolve(process.env.UPLOAD_DIR)
@@ -93,6 +96,64 @@ export async function saveFile(
   await fs.writeFile(fullPath, buffer);
 
   // Return formatted URL and storage path
+  const normalizedPath = relativePath.replace(/\\/g, '/');
+  return {
+    storagePath: normalizedPath,
+    webUrl: `/api/files/${normalizedPath}`,
+  };
+}
+
+export class FileSizeLimitError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'FileSizeLimitError';
+  }
+}
+
+// Writes an incoming stream (e.g. a multipart file body) to disk without
+// buffering the whole file in memory. Enforces a hard byte cap so a malicious
+// client cannot exhaust memory or disk, and writes to a temp file first so a
+// partial upload never leaves a half-written file at the final path.
+export async function saveFileStream(
+  relativePath: string,
+  stream: ReadableStream<Uint8Array>,
+  maxBytes = MAX_FILE_SIZE_BYTES
+): Promise<{ storagePath: string; webUrl: string }> {
+  const fullPath = getSafePath(relativePath);
+  await fs.mkdir(path.dirname(fullPath), { recursive: true });
+  const tempPath = `${fullPath}.${crypto.randomBytes(8).toString('hex')}.tmp`;
+
+  const tooLarge = () =>
+    new FileSizeLimitError(
+      `O ficheiro excede o limite máximo permitido de ${MAX_FILE_SIZE_MB} MB.`
+    );
+
+  let bytesWritten = 0;
+  const limitGuard = new Transform({
+    transform(chunk, _encoding, callback) {
+      bytesWritten += Buffer.byteLength(chunk);
+      if (bytesWritten > maxBytes) {
+        callback(tooLarge());
+        return;
+      }
+      callback(null, chunk);
+    },
+  });
+
+  try {
+    await pipeline(
+      Readable.fromWeb(stream),
+      limitGuard,
+      createWriteStream(tempPath)
+    );
+    await fs.rename(tempPath, fullPath);
+  } catch (err) {
+    await fs.rm(tempPath, { force: true }).catch(() => {});
+    throw err instanceof FileSizeLimitError
+      ? err
+      : new Error('Falha ao guardar o ficheiro.');
+  }
+
   const normalizedPath = relativePath.replace(/\\/g, '/');
   return {
     storagePath: normalizedPath,

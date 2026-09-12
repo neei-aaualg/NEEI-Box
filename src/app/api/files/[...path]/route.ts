@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import fs from 'fs/promises';
 import path from 'path';
-import { getFileStats } from '@/lib/storage';
+import { Readable } from 'stream';
+import { getFileStats, getFileStream } from '@/lib/storage';
 import { getCurrentUser } from '@/lib/auth/session';
 import { isActiveContentExtension, canServeInline } from '@/lib/file-types';
 
@@ -59,9 +59,10 @@ export async function GET(
     !isActive && canServeInline(ext) ? 'inline' : 'attachment';
   const fileName = path.basename(stats.fullPath).replace(/["\\]/g, '_');
 
-  const fileBuffer = await fs.readFile(stats.fullPath);
+  const fileStream = getFileStream(stats.fullPath);
+  const body = Readable.toWeb(fileStream) as ReadableStream<Uint8Array>;
 
-  return new NextResponse(fileBuffer, {
+  return new NextResponse(body, {
     status: 200,
     headers: {
       ...FILE_RESPONSE_HEADERS,

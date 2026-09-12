@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { NextRequest } from 'next/server';
+import { Readable } from 'stream';
 
 const sessionMocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
@@ -7,10 +8,7 @@ const sessionMocks = vi.hoisted(() => ({
 
 const storageMocks = vi.hoisted(() => ({
   getFileStats: vi.fn(),
-}));
-
-const fsMocks = vi.hoisted(() => ({
-  readFile: vi.fn(),
+  getFileStream: vi.fn(),
 }));
 
 vi.mock('@/lib/auth/session', () => ({
@@ -19,11 +17,7 @@ vi.mock('@/lib/auth/session', () => ({
 
 vi.mock('@/lib/storage', () => ({
   getFileStats: storageMocks.getFileStats,
-}));
-
-vi.mock('fs/promises', () => ({
-  default: fsMocks,
-  readFile: fsMocks.readFile,
+  getFileStream: storageMocks.getFileStream,
 }));
 
 import { GET } from '@/app/api/files/[...path]/route';
@@ -37,6 +31,12 @@ function paramsWrapper(pathParts: string[]) {
 
 function makeRequest(): NextRequest {
   return new NextRequest('http://localhost/api/files/u1/a.pdf');
+}
+
+function fileStream(content: string) {
+  storageMocks.getFileStream.mockImplementation(() =>
+    Readable.from(Buffer.from(content))
+  );
 }
 
 describe('GET /api/files/[...path]', () => {
@@ -62,7 +62,7 @@ describe('GET /api/files/[...path]', () => {
       size: 42,
       mtime: new Date(),
     });
-    fsMocks.readFile.mockResolvedValue(Buffer.from('pdf-content'));
+    fileStream('pdf-content');
 
     const res = await GET(makeRequest(), paramsWrapper(['u1', 'a.pdf']));
     expect(res.status).toBe(200);
@@ -71,6 +71,7 @@ describe('GET /api/files/[...path]', () => {
     expect(res.headers.get('cache-control')).toBe(
       'private, max-age=31536000, immutable'
     );
+    await expect(res.text()).resolves.toBe('pdf-content');
   });
 
   it('adds security headers to every file response', async () => {
@@ -80,7 +81,7 @@ describe('GET /api/files/[...path]', () => {
       size: 3,
       mtime: new Date(),
     });
-    fsMocks.readFile.mockResolvedValue(Buffer.from('pdf'));
+    fileStream('pdf');
 
     const res = await GET(makeRequest(), paramsWrapper(['u1', 'a.pdf']));
     expect(res.headers.get('x-content-type-options')).toBe('nosniff');
@@ -97,7 +98,7 @@ describe('GET /api/files/[...path]', () => {
       size: 3,
       mtime: new Date(),
     });
-    fsMocks.readFile.mockResolvedValue(Buffer.from('pdf'));
+    fileStream('pdf');
 
     const res = await GET(makeRequest(), paramsWrapper(['u1', 'a.pdf']));
     expect(res.headers.get('content-disposition')).toBe(
@@ -112,9 +113,7 @@ describe('GET /api/files/[...path]', () => {
       size: 10,
       mtime: new Date(),
     });
-    fsMocks.readFile.mockResolvedValue(
-      Buffer.from('<script>alert(1)</script>')
-    );
+    fileStream('<script>alert(1)</script>');
 
     const res = await GET(makeRequest(), paramsWrapper(['u1', 'evil.svg']));
     expect(res.headers.get('content-type')).toBe('application/octet-stream');
@@ -130,7 +129,7 @@ describe('GET /api/files/[...path]', () => {
       size: 5,
       mtime: new Date(),
     });
-    fsMocks.readFile.mockResolvedValue(Buffer.from('png'));
+    fileStream('png');
     const res = await GET(makeRequest(), paramsWrapper(['u1', 'foto.png']));
     expect(res.headers.get('content-type')).toBe('image/png');
     expect(res.headers.get('content-disposition')).toBe(
@@ -145,7 +144,7 @@ describe('GET /api/files/[...path]', () => {
       size: 3,
       mtime: new Date(),
     });
-    fsMocks.readFile.mockResolvedValue(Buffer.from('abc'));
+    fileStream('abc');
 
     const res = await GET(makeRequest(), paramsWrapper(['u1', 'a.weird']));
     expect(res.headers.get('content-type')).toBe('application/octet-stream');
@@ -158,7 +157,7 @@ describe('GET /api/files/[...path]', () => {
       size: 1,
       mtime: new Date(),
     });
-    fsMocks.readFile.mockResolvedValue(Buffer.from('x'));
+    fileStream('x');
     const res = await GET(
       makeRequest(),
       paramsWrapper(['u1', 'sub', 'deep', 'a.pdf'])

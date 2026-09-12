@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/db';
 import {
-  saveFile,
+  saveFileStream,
+  FileSizeLimitError,
   MAX_FILE_SIZE_MB,
   MAX_FILE_SIZE_BYTES,
   checkStorageCapacity,
@@ -81,9 +82,17 @@ export async function POST(request: Request) {
 
     const safeName = sanitizeFileName(originalName);
     const relativePath = `${user.id}/${crypto.randomUUID()}-${safeName}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
 
-    const { storagePath, webUrl } = await saveFile(relativePath, buffer);
+    let stored: { storagePath: string; webUrl: string };
+    try {
+      stored = await saveFileStream(relativePath, file.stream());
+    } catch (error) {
+      if (error instanceof FileSizeLimitError) {
+        return NextResponse.json({ error: error.message }, { status: 413 });
+      }
+      throw error;
+    }
+    const { storagePath, webUrl } = stored;
 
     const material = await prisma.material.create({
       data: {
