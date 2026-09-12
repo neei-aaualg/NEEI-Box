@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 import { getFileStats } from '@/lib/storage';
+import { getCurrentUser } from '@/lib/auth/session';
 
 const MIME_TYPES: Record<string, string> = {
   '.pdf': 'application/pdf',
@@ -21,6 +22,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return new NextResponse('Não autorizado.', { status: 401 });
+  }
+
   const resolvedParams = await params;
   const relativePath = (resolvedParams.path || []).join('/');
 

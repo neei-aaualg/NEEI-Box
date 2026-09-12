@@ -8,7 +8,7 @@ export function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  if (!isAuthenticated && pathname.startsWith('/api/materials')) {
+  if (!isAuthenticated && pathname.startsWith('/api')) {
     return NextResponse.json({ error: 'Não autorizado.' }, { status: 401 });
   }
 
@@ -31,5 +31,13 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api/materials/upload|api/health|api/files|.*\\..*).*)'],
+  matcher: [
+    '/courses/:path*',
+    '/admin/:path*',
+    '/login',
+    '/api/materials/:path*',
+    '/api/files/:path*',
+    '/api/courses/:path*',
+    '/api/admin/:path*',
+  ],
 };
