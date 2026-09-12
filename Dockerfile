@@ -67,5 +67,9 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://127.0.0.1:3000/api/health || exit 1
 
-# Automatically push database schema on startup if DATABASE_URL is set, then start server
-CMD ["sh", "-c", "if [ -n \"$DATABASE_URL\" ]; then prisma db push --skip-generate || echo 'Aviso: Falha ao sincronizar schema do Prisma'; fi; exec node server.js"]
+# Apply versioned Prisma migrations on startup when DATABASE_URL is set.
+# migrate deploy is the primary path (fresh deployments create the schema in a
+# tracked, non-destructive way). For databases already provisioned outside of
+# Prisma Migrate, fall back to a non-destructive `db push` (no
+# --accept-data-loss) so the app keeps booting without ever dropping data.
+CMD ["sh", "-c", "if [ -n \"$DATABASE_URL\" ]; then prisma migrate deploy || { echo 'Aviso: migrate deploy falhou; a tentar db push seguro.'; prisma db push --skip-generate || echo 'Aviso: Falha ao sincronizar schema do Prisma.'; }; fi; exec node server.js"]

@@ -14,8 +14,9 @@ const prismaMocks = vi.hoisted(() => ({
 }));
 
 const storageMocks = vi.hoisted(() => ({
-  saveFile: vi.fn(),
+  saveFileStream: vi.fn(),
   checkStorageCapacity: vi.fn(),
+  FileSizeLimitError: class FileSizeLimitError extends Error {},
 }));
 
 vi.mock('@/lib/auth/session', () => ({
@@ -27,8 +28,9 @@ vi.mock('@/lib/db', () => ({
 }));
 
 vi.mock('@/lib/storage', () => ({
-  saveFile: storageMocks.saveFile,
+  saveFileStream: storageMocks.saveFileStream,
   checkStorageCapacity: storageMocks.checkStorageCapacity,
+  FileSizeLimitError: storageMocks.FileSizeLimitError,
   MAX_FILE_SIZE_MB: 50,
   MAX_FILE_SIZE_BYTES: 50 * 1024 * 1024,
 }));
@@ -141,7 +143,7 @@ describe('POST /api/materials/upload', () => {
     sessionMocks.getCurrentUser.mockResolvedValue(studentUser);
     storageMocks.checkStorageCapacity.mockResolvedValue({ allowed: true });
     prismaMocks.course.findUnique.mockResolvedValue(dbCourse);
-    storageMocks.saveFile.mockResolvedValue({
+    storageMocks.saveFileStream.mockResolvedValue({
       storagePath: 'student-1/uuid-Apontamentos Logica.pdf',
       webUrl: '/api/files/student-1/uuid-Apontamentos Logica.pdf',
     });
@@ -157,9 +159,9 @@ describe('POST /api/materials/upload', () => {
         pdfFile('Apontamentos Lógica.pdf')
       )
     );
-    expect(storageMocks.saveFile).toHaveBeenCalledWith(
+    expect(storageMocks.saveFileStream).toHaveBeenCalledWith(
       expect.stringMatching(/^student-1\/[0-9a-f-]+-Apontamentos_Logica\.pdf$/),
-      expect.any(Buffer)
+      expect.any(Object)
     );
   });
 
@@ -167,7 +169,7 @@ describe('POST /api/materials/upload', () => {
     sessionMocks.getCurrentUser.mockResolvedValue(studentUser);
     storageMocks.checkStorageCapacity.mockResolvedValue({ allowed: true });
     prismaMocks.course.findUnique.mockResolvedValue(dbCourse);
-    storageMocks.saveFile.mockResolvedValue({
+    storageMocks.saveFileStream.mockResolvedValue({
       storagePath: 'student-1/u-a.pdf',
       webUrl: '/api/files/student-1/u-a.pdf',
     });
@@ -197,7 +199,7 @@ describe('POST /api/materials/upload', () => {
     sessionMocks.getCurrentUser.mockResolvedValue(adminUser);
     storageMocks.checkStorageCapacity.mockResolvedValue({ allowed: true });
     prismaMocks.course.findUnique.mockResolvedValue(dbCourse);
-    storageMocks.saveFile.mockResolvedValue({
+    storageMocks.saveFileStream.mockResolvedValue({
       storagePath: 'admin-1/u-a.pdf',
       webUrl: '/api/files/admin-1/u-a.pdf',
     });
@@ -223,7 +225,7 @@ describe('POST /api/materials/upload', () => {
     sessionMocks.getCurrentUser.mockResolvedValue(studentUser);
     storageMocks.checkStorageCapacity.mockResolvedValue({ allowed: true });
     prismaMocks.course.findUnique.mockResolvedValue(dbCourse);
-    storageMocks.saveFile.mockResolvedValue({
+    storageMocks.saveFileStream.mockResolvedValue({
       storagePath: 'student-1/u.pdf',
       webUrl: '/api/files/student-1/u.pdf',
     });
@@ -250,7 +252,7 @@ describe('POST /api/materials/upload', () => {
     sessionMocks.getCurrentUser.mockResolvedValue(studentUser);
     storageMocks.checkStorageCapacity.mockResolvedValue({ allowed: true });
     prismaMocks.course.findUnique.mockResolvedValue(dbCourse);
-    storageMocks.saveFile.mockResolvedValue({
+    storageMocks.saveFileStream.mockResolvedValue({
       storagePath: 'student-1/u.pdf',
       webUrl: '/api/files/student-1/u.pdf',
     });
@@ -268,7 +270,7 @@ describe('POST /api/materials/upload', () => {
     sessionMocks.getCurrentUser.mockResolvedValue(studentUser);
     storageMocks.checkStorageCapacity.mockResolvedValue({ allowed: true });
     prismaMocks.course.findUnique.mockResolvedValue(dbCourse);
-    storageMocks.saveFile.mockResolvedValue({
+    storageMocks.saveFileStream.mockResolvedValue({
       storagePath: 'student-1/u.pdf',
       webUrl: '/api/files/student-1/u.pdf',
     });
@@ -286,10 +288,25 @@ describe('POST /api/materials/upload', () => {
     sessionMocks.getCurrentUser.mockResolvedValue(studentUser);
     storageMocks.checkStorageCapacity.mockResolvedValue({ allowed: true });
     prismaMocks.course.findUnique.mockResolvedValue(dbCourse);
-    storageMocks.saveFile.mockRejectedValue(new Error('disk full'));
+    storageMocks.saveFileStream.mockRejectedValue(new Error('disk full'));
     const res = await POST(
       formRequest({ course_id: 'c1', title: 'T' }, pdfFile())
     );
     expect(res.status).toBe(500);
+  });
+
+  it('returns 413 when the streamed file exceeds the size limit mid-write', async () => {
+    sessionMocks.getCurrentUser.mockResolvedValue(studentUser);
+    storageMocks.checkStorageCapacity.mockResolvedValue({ allowed: true });
+    prismaMocks.course.findUnique.mockResolvedValue(dbCourse);
+    storageMocks.saveFileStream.mockRejectedValue(
+      new storageMocks.FileSizeLimitError(
+        'O ficheiro excede o limite máximo permitido de 50 MB.'
+      )
+    );
+    const res = await POST(
+      formRequest({ course_id: 'c1', title: 'T' }, pdfFile())
+    );
+    expect(res.status).toBe(413);
   });
 });

@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createAndSendOtp } from '@/lib/auth/otp';
+import { rateLimit } from '@/lib/rate-limit';
+import { clientFacingError } from '@/lib/http';
+
+// Max codes per email per window; prevents OTP churn on a victim's address.
+const EMAIL_LIMIT = 5;
+const EMAIL_WINDOW_MS = 15 * 60 * 1000;
 
 export async function POST(request: Request) {
   try {
@@ -33,10 +39,32 @@ export async function POST(request: Request) {
       );
     }
 
+    const { allowed, retryAfterMs } = rateLimit(
+      `login:${email}`,
+      EMAIL_LIMIT,
+      EMAIL_WINDOW_MS
+    );
+    if (!allowed) {
+      const seconds = retryAfterMs
+        ? Math.ceil(retryAfterMs / 1000)
+        : EMAIL_WINDOW_MS / 1000;
+      return NextResponse.json(
+        {
+          error: `Demasiados pedidos para este email. Aguarda ${seconds}s.`,
+        },
+        { status: 429 }
+      );
+    }
+
     const result = await createAndSendOtp(email);
     if (!result.success) {
       return NextResponse.json(
-        { error: result.error || 'Erro ao enviar o código de confirmação.' },
+        {
+          error: clientFacingError(
+            result.error,
+            'Erro ao enviar o código de confirmação.'
+          ),
+        },
         { status: 500 }
       );
     }
@@ -46,8 +74,11 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    const msg =
-      error instanceof Error ? error.message : 'Erro interno do servidor.';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: clientFacingError(error, 'Erro interno do servidor.'),
+      },
+      { status: 500 }
+    );
   }
 }

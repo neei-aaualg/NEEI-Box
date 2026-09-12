@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { existsSync } from 'fs';
+import { Readable } from 'stream';
 
 vi.hoisted(() => {
   process.env.UPLOAD_DIR = '/var/uploads';
@@ -15,6 +16,8 @@ const mocks = vi.hoisted(() => {
     stat: vi.fn(),
     unlink: vi.fn(),
     readFile: vi.fn(),
+    rename: vi.fn(),
+    rm: vi.fn(),
   };
 });
 
@@ -25,11 +28,19 @@ vi.mock('fs/promises', () => ({
 
 vi.mock('fs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('fs')>();
-  const { Readable } = await import('stream');
+  const { Readable, Writable } = await import('stream');
   return {
     ...actual,
     existsSync: vi.fn(),
     createReadStream: vi.fn(() => new Readable({ read() {} })),
+    createWriteStream: vi.fn(
+      () =>
+        new Writable({
+          write(_chunk, _encoding, callback) {
+            callback();
+          },
+        })
+    ),
   };
 });
 
@@ -39,6 +50,8 @@ import {
   MAX_STORAGE_LIMIT_GB,
   MAX_STORAGE_LIMIT_BYTES,
   saveFile,
+  saveFileStream,
+  FileSizeLimitError,
   deleteFile,
   getFileStats,
   checkStorageCapacity,
@@ -230,6 +243,51 @@ describe('checkStorageCapacity', () => {
     expect(result.allowed).toBe(false);
     expect(result.error).toContain('2.00 GB');
     expect(result.error).toContain('7168.0 MB');
+  });
+});
+
+describe('saveFileStream', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.mkdir.mockResolvedValue(undefined);
+    mocks.rename.mockResolvedValue(undefined);
+    mocks.rm.mockResolvedValue(undefined);
+  });
+
+  function webStreamOf(content: string): ReadableStream<Uint8Array> {
+    return Readable.toWeb(
+      Readable.from(Buffer.from(content))
+    ) as ReadableStream<Uint8Array>;
+  }
+
+  it('streams the content to a temp file and renames it into place', async () => {
+    const result = await saveFileStream('user-1/abc.pdf', webStreamOf('data'));
+    expect(result.storagePath).toBe('user-1/abc.pdf');
+    expect(result.webUrl).toBe('/api/files/user-1/abc.pdf');
+    expect(mocks.rename).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /^\/var\/uploads\/user-1\/abc\.pdf\.[0-9a-f]+\.tmp$/
+      ),
+      '/var/uploads/user-1/abc.pdf'
+    );
+  });
+
+  it('rejects files that exceed the byte cap and cleans up the temp file', async () => {
+    await expect(
+      saveFileStream('user-1/big.bin', webStreamOf('123456'), 3)
+    ).rejects.toBeInstanceOf(FileSizeLimitError);
+    expect(mocks.rm).toHaveBeenCalledWith(
+      expect.stringMatching(/big\.bin\.[0-9a-f]+\.tmp$/),
+      expect.objectContaining({ force: true })
+    );
+  });
+
+  it('cleans up the temp file when the final rename fails', async () => {
+    mocks.rename.mockRejectedValue(new Error('disk full'));
+    await expect(
+      saveFileStream('user-1/a.pdf', webStreamOf('data'))
+    ).rejects.toThrow('Falha ao guardar o ficheiro.');
+    expect(mocks.rm).toHaveBeenCalled();
   });
 });
 

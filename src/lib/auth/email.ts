@@ -10,8 +10,14 @@ export async function sendOtpEmail(
   const pass = process.env.SMTP_PASS;
   const from = process.env.SMTP_FROM || 'NEEI-Box <no-reply@neei.online>';
 
-  // Fallback for development if SMTP is not yet configured
+  // Fail closed: never print OTP codes to logs in production. If SMTP is
+  // misconfigured there, sending must fail so the login flow stops instead of
+  // exposing codes to anyone with access to the container logs.
   if (!host || !user || !pass) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Serviço de email não configurado.');
+    }
+    // Fallback for development if SMTP is not yet configured
     console.log(`\n==============================================`);
     console.log(`[AUTH-DEV] Código de Acesso OTP para ${email}: ${code}`);
     console.log(`==============================================\n`);

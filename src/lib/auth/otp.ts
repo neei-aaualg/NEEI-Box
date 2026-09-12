@@ -6,6 +6,14 @@ function hashOtp(code: string): string {
   return crypto.createHash('sha256').update(code.trim()).digest('hex');
 }
 
+// Constant-time comparison to avoid timing attacks on OTP codes. Both inputs
+// are the same-length hex digests, so timingSafeEqual is safe to use here.
+function constantTimeEqual(a: string, b: string): boolean {
+  const ab = Buffer.from(a, 'utf8');
+  const bb = Buffer.from(b, 'utf8');
+  return ab.length === bb.length && crypto.timingSafeEqual(ab, bb);
+}
+
 export async function createAndSendOtp(
   email: string
 ): Promise<{ success: boolean; error?: string }> {
@@ -72,7 +80,7 @@ export async function verifyOtpCode(
       };
     }
 
-    if (tokenRecord.tokenHash !== tokenHash) {
+    if (!constantTimeEqual(tokenRecord.tokenHash, tokenHash)) {
       await prisma.otpToken.update({
         where: { id: tokenRecord.id },
         data: { attempts: { increment: 1 } },

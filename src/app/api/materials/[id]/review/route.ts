@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/db';
 import { deleteFile } from '@/lib/storage';
+import { clientFacingError } from '@/lib/http';
 
 const ALLOWED_STATUSES = ['approved', 'rejected'];
 
@@ -81,8 +82,7 @@ export async function POST(
       message: 'Material aprovado com sucesso.',
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Erro ao processar revisão.';
+    const message = clientFacingError(error, 'Erro ao processar revisão.');
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

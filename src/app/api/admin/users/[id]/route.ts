@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/db';
 import { Role } from '@prisma/client';
+import { clientFacingError } from '@/lib/http';
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -79,8 +80,7 @@ export async function PATCH(request: Request, { params }: Params) {
       message: `Cargo de ${updated.email} atualizado para ${targetRole === 'ADMIN' ? 'Administrador' : 'Estudante'}.`,
     });
   } catch (error) {
-    const msg =
-      error instanceof Error ? error.message : 'Erro ao atualizar utilizador.';
+    const msg = clientFacingError(error, 'Erro ao atualizar utilizador.');
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

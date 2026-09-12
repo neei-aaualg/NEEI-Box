@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/db';
+import { clientFacingError } from '@/lib/http';
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -74,10 +75,10 @@ export async function POST(request: Request) {
       materials_count: 0,
     });
   } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : 'Erro ao criar Unidade Curricular.';
+    const message = clientFacingError(
+      error,
+      'Erro ao criar Unidade Curricular.'
+    );
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

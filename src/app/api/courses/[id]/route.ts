@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/db';
 import { deleteFile } from '@/lib/storage';
+import { clientFacingError } from '@/lib/http';
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -67,10 +68,10 @@ export async function PATCH(request: Request, { params }: Params) {
       materials_count: updated._count.materials,
     });
   } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : 'Erro ao atualizar Unidade Curricular.';
+    const message = clientFacingError(
+      error,
+      'Erro ao atualizar Unidade Curricular.'
+    );
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -105,10 +106,10 @@ export async function DELETE(request: Request, { params }: Params) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : 'Erro ao eliminar Unidade Curricular.';
+    const message = clientFacingError(
+      error,
+      'Erro ao eliminar Unidade Curricular.'
+    );
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
