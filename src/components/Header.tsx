@@ -42,7 +42,7 @@ export default function Header({ user, isAdmin }: HeaderProps) {
         <div className="flex items-center gap-6 sm:gap-8">
           <Link
             href="/"
-            className="flex h-full items-center rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
+            className="group flex h-full items-center gap-2 rounded-lg transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600"
             aria-label="NEEI-Box — Início"
           >
             <Image
@@ -53,6 +53,9 @@ export default function Header({ user, isAdmin }: HeaderProps) {
               priority
               className="h-14 w-auto object-contain sm:h-16 lg:h-[2.35rem] drop-shadow-[0_0_2.5px_rgba(34,211,238,0.25)]"
             />
+            <span className="inline-flex items-center rounded-md border border-brand-500/30 bg-gradient-to-r from-brand-500/15 to-brand-400/10 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-brand-700 shadow-[0_0_12px_rgba(34,211,238,0.12)] backdrop-blur-xs transition-all duration-200 group-hover:border-brand-500/50 group-hover:from-brand-500/25 group-hover:to-brand-400/20 group-hover:text-brand-800 sm:text-xs dark:border-brand-400/30 dark:bg-gradient-to-r dark:from-brand-400/15 dark:to-cyan-400/10 dark:text-brand-300 dark:shadow-[0_0_14px_rgba(34,211,238,0.2)] dark:group-hover:border-brand-400/50 dark:group-hover:text-brand-200">
+              Box
+            </span>
           </Link>
 
           <nav
