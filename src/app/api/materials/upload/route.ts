@@ -9,6 +9,7 @@ import {
   checkStorageCapacity,
 } from '@/lib/storage';
 import { sanitizeFileName, getFileType } from '@/lib/file-types';
+import { clientFacingError } from '@/lib/http';
 import crypto from 'crypto';
 
 export async function POST(request: Request) {
@@ -88,7 +89,10 @@ export async function POST(request: Request) {
       stored = await saveFileStream(relativePath, file.stream());
     } catch (error) {
       if (error instanceof FileSizeLimitError) {
-        return NextResponse.json({ error: error.message }, { status: 413 });
+        return NextResponse.json(
+          { error: 'O ficheiro excede o limite máximo permitido.' },
+          { status: 413 }
+        );
       }
       throw error;
     }
@@ -128,8 +132,7 @@ export async function POST(request: Request) {
         : 'Material submetido para aprovação.',
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Erro interno no servidor.';
+    const message = clientFacingError(error, 'Erro interno no servidor.');
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

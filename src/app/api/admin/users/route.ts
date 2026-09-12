@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import prisma from '@/lib/db';
 import { Role } from '@prisma/client';
+import { clientFacingError } from '@/lib/http';
 
 export async function GET() {
   try {
@@ -23,8 +24,7 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    const msg =
-      error instanceof Error ? error.message : 'Erro ao obter utilizadores.';
+    const msg = clientFacingError(error, 'Erro ao obter utilizadores.');
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
@@ -67,8 +67,7 @@ export async function POST(request: Request) {
       message: `Utilizador ${email} definido como ${role === 'ADMIN' ? 'Administrador' : 'Estudante'}.`,
     });
   } catch (error) {
-    const msg =
-      error instanceof Error ? error.message : 'Erro ao atualizar utilizador.';
+    const msg = clientFacingError(error, 'Erro ao atualizar utilizador.');
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

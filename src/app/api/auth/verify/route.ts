@@ -4,6 +4,7 @@ import { createSession } from '@/lib/auth/session';
 import prisma from '@/lib/db';
 import { Role } from '@prisma/client';
 import { rateLimit } from '@/lib/rate-limit';
+import { clientFacingError } from '@/lib/http';
 
 // Max verification attempts per email per window; forces attackers to request
 // a new code (and hit the login rate limit) before brute-forcing further.
@@ -78,8 +79,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    const msg =
-      error instanceof Error ? error.message : 'Erro na autenticação.';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json(
+      { error: clientFacingError(error, 'Erro na autenticação.') },
+      { status: 500 }
+    );
   }
 }
