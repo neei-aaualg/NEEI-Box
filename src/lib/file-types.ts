@@ -46,13 +46,49 @@ export const IMAGE_EXTENSIONS = [
   'jpg',
   'jpeg',
   'gif',
-  'svg',
   'webp',
   'bmp',
   'avif',
 ];
 const VIDEO_EXTENSIONS = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
 const ARCHIVE_EXTENSIONS = ['zip', 'rar', '7z', 'tar', 'gz', 'tgz', 'bz2'];
+
+// Extensions that can execute script in the browser when served inline.
+// These are never served with a renderable content type to prevent stored XSS.
+export const ACTIVE_CONTENT_EXTENSIONS = [
+  'svg',
+  'html',
+  'htm',
+  'xml',
+  'xhtml',
+  'shtml',
+  'mht',
+  'mhtml',
+  'htc',
+  'swf',
+  'hta',
+  'xsl',
+  'xslt',
+];
+
+// Raster image formats safe to render inline (script-free by construction).
+const INLINE_SAFE_IMAGE_EXTENSIONS = [
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+  'webp',
+  'avif',
+  'bmp',
+];
+
+export function isActiveContentExtension(ext: string): boolean {
+  return ACTIVE_CONTENT_EXTENSIONS.includes(ext.toLowerCase());
+}
+
+export function canServeInline(ext: string): boolean {
+  return INLINE_SAFE_IMAGE_EXTENSIONS.includes(ext.toLowerCase());
+}
 
 export function getFileExtension(fileName: string): string {
   const match = /\.([a-z0-9]+)$/i.exec(fileName.trim());

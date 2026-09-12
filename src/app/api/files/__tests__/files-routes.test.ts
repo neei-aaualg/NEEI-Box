@@ -69,7 +69,72 @@ describe('GET /api/files/[...path]', () => {
     expect(res.headers.get('content-type')).toBe('application/pdf');
     expect(res.headers.get('content-length')).toBe('42');
     expect(res.headers.get('cache-control')).toBe(
-      'public, max-age=31536000, immutable'
+      'private, max-age=31536000, immutable'
+    );
+  });
+
+  it('adds security headers to every file response', async () => {
+    sessionMocks.getCurrentUser.mockResolvedValue(user);
+    storageMocks.getFileStats.mockResolvedValue({
+      fullPath: '/var/uploads/u1/a.pdf',
+      size: 3,
+      mtime: new Date(),
+    });
+    fsMocks.readFile.mockResolvedValue(Buffer.from('pdf'));
+
+    const res = await GET(makeRequest(), paramsWrapper(['u1', 'a.pdf']));
+    expect(res.headers.get('x-content-type-options')).toBe('nosniff');
+    expect(res.headers.get('content-security-policy')).toBe(
+      "default-src 'none'; sandbox"
+    );
+    expect(res.headers.get('referrer-policy')).toBe('no-referrer');
+  });
+
+  it('forces documents to download as attachments', async () => {
+    sessionMocks.getCurrentUser.mockResolvedValue(user);
+    storageMocks.getFileStats.mockResolvedValue({
+      fullPath: '/var/uploads/u1/a.pdf',
+      size: 3,
+      mtime: new Date(),
+    });
+    fsMocks.readFile.mockResolvedValue(Buffer.from('pdf'));
+
+    const res = await GET(makeRequest(), paramsWrapper(['u1', 'a.pdf']));
+    expect(res.headers.get('content-disposition')).toBe(
+      'attachment; filename="a.pdf"'
+    );
+  });
+
+  it('forces active content such as SVG to octet-stream attachments', async () => {
+    sessionMocks.getCurrentUser.mockResolvedValue(user);
+    storageMocks.getFileStats.mockResolvedValue({
+      fullPath: '/var/uploads/u1/evil.svg',
+      size: 10,
+      mtime: new Date(),
+    });
+    fsMocks.readFile.mockResolvedValue(
+      Buffer.from('<script>alert(1)</script>')
+    );
+
+    const res = await GET(makeRequest(), paramsWrapper(['u1', 'evil.svg']));
+    expect(res.headers.get('content-type')).toBe('application/octet-stream');
+    expect(res.headers.get('content-disposition')).toBe(
+      'attachment; filename="evil.svg"'
+    );
+  });
+
+  it('serves raster images inline for previews', async () => {
+    sessionMocks.getCurrentUser.mockResolvedValue(user);
+    storageMocks.getFileStats.mockResolvedValue({
+      fullPath: '/var/uploads/u1/foto.png',
+      size: 5,
+      mtime: new Date(),
+    });
+    fsMocks.readFile.mockResolvedValue(Buffer.from('png'));
+    const res = await GET(makeRequest(), paramsWrapper(['u1', 'foto.png']));
+    expect(res.headers.get('content-type')).toBe('image/png');
+    expect(res.headers.get('content-disposition')).toBe(
+      'inline; filename="foto.png"'
     );
   });
 
