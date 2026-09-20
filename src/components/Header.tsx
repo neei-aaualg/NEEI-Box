@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -13,7 +13,6 @@ interface HeaderProps {
 
 export default function Header({ user, isAdmin }: HeaderProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -32,8 +31,9 @@ export default function Header({ user, isAdmin }: HeaderProps) {
       await fetch('/api/auth/logout', { method: 'POST' });
     } catch {
     } finally {
-      router.push('/login');
-      router.refresh();
+      // Hard navigation ensures root layout and header clear the session state.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.href = '/login';
     }
   };
 

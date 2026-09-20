@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 const features = [
   {
@@ -98,7 +97,6 @@ const features = [
 ];
 
 export default function LoginForm() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [token, setToken] = useState('');
   const [step, setStep] = useState<'email' | 'code'>('email');
@@ -183,8 +181,9 @@ export default function LoginForm() {
         );
       }
 
-      router.push('/courses');
-      router.refresh();
+      // Hard navigation ensures root layout and header refresh with the new session cookie.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.href = '/courses';
     } catch (err: unknown) {
       if (err instanceof Error) {
         setErrorMsg(err.message);

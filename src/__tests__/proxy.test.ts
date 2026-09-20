@@ -35,10 +35,17 @@ describe('proxy auth gate', () => {
     }
   );
 
-  it('redirects authenticated users away from /login to /courses', () => {
+  it('allows requests with session cookies to /login through for DB verification', () => {
     const res = proxy(makeRequest('/login', true));
-    expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe(`${BASE}/courses`);
+    expect(res.status).toBe(200);
+  });
+
+  it('deletes session cookie when redirected to /login with expired parameter', () => {
+    const res = proxy(makeRequest('/login?expired=1', true));
+    expect(res.status).toBe(200);
+    const setCookie = res.headers.get('set-cookie');
+    expect(setCookie).toBeTruthy();
+    expect(setCookie).toContain('__Host-neei_box_session=;');
   });
 
   it('allows authenticated API requests through', () => {

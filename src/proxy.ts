@@ -83,8 +83,10 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  if (isAuthenticated && pathname === '/login') {
-    return NextResponse.redirect(new URL('/courses', request.url));
+  if (pathname === '/login' && request.nextUrl.searchParams.has('expired')) {
+    const response = NextResponse.next();
+    response.cookies.delete(SESSION_COOKIE_NAME);
+    return response;
   }
 
   return NextResponse.next();

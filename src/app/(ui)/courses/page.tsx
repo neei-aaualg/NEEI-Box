@@ -13,7 +13,7 @@ export default async function CoursesPage() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect('/login');
+    redirect('/login?expired=1');
   }
 
   const isAdmin = user.role === 'ADMIN';
