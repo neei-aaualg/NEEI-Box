@@ -196,265 +196,268 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-2">
-      {/* Painel de marca */}
-      <div className="relative hidden overflow-hidden bg-gradient-to-br from-brand-950 via-brand-900 to-[#072535] p-10 lg:flex lg:flex-col lg:justify-between lg:border-r lg:border-cyan-500/20 xl:p-14">
-        {/* Padrão subtil de pontos em tom ciano */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(100,189,226,0.14)_1px,transparent_0)] [background-size:24px_24px]"
-        />
+    <div className="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-gradient-to-b from-brand-50/70 via-white to-zinc-50 dark:from-brand-950/70 dark:via-night-950 dark:to-night-950">
+      {/* Background ambient lighting and pattern */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-32 left-1/2 h-[520px] w-[800px] -translate-x-1/2 rounded-full bg-brand-300/25 blur-3xl dark:bg-brand-600/15"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-32 right-10 h-[480px] w-[480px] rounded-full bg-cyan-400/15 blur-[120px] dark:bg-cyan-500/10"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgb(11_51_69/0.05)_1px,transparent_0)] [background-size:28px_28px] dark:bg-[radial-gradient(circle_at_1px_1px,rgb(151_214_238/0.05)_1px,transparent_0)]"
+      />
 
-        {/* Efeitos de iluminação ambiente com cores vibrantes */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -left-16 -top-16 h-[420px] w-[420px] rounded-full bg-cyan-400/20 blur-[100px]"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-24 -right-16 h-[440px] w-[440px] rounded-full bg-sky-500/25 blur-[110px]"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 left-10 -translate-y-1/2 h-[350px] w-[350px] rounded-full bg-cyan-500/10 blur-[90px]"
-        />
+      <div className="relative mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl items-center gap-8 px-4 py-8 sm:px-6 lg:grid-cols-12 lg:gap-12 lg:py-12">
+        {/* Formulário na esquerda (col-span-5) */}
+        <div className="flex w-full justify-center lg:col-span-5">
+          <div className="w-full max-w-md rounded-3xl border border-zinc-200/80 bg-white/95 p-8 shadow-card backdrop-blur-xl sm:p-10 dark:border-white/10 dark:bg-night-900/90">
+            {/* Logo em mobile */}
+            <div className="mb-8 flex items-center gap-3 lg:hidden">
+              <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl ring-1 ring-zinc-900/10 dark:ring-white/10">
+                <Image
+                  src="/neei-logo.png"
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-cover"
+                />
+              </span>
+              <span className="text-base font-bold tracking-tight text-zinc-900 dark:text-white">
+                NEEI-Box
+              </span>
+            </div>
 
-        {/* Cabeçalho do painel com outline luminosa */}
-        <div className="relative">
-          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/50 bg-gradient-to-r from-cyan-500/20 via-sky-500/15 to-brand-500/10 px-3.5 py-1.5 text-xs font-semibold text-cyan-200 shadow-[0_0_20px_rgba(34,211,238,0.25)] ring-1 ring-cyan-400/20 backdrop-blur-md">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
-            </span>
-            Repositório Académico · NEEI UAlg
-          </div>
-        </div>
-
-        {/* Conteúdo central */}
-        <div className="relative my-auto max-w-lg py-8">
-          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl xl:text-[2.65rem] xl:leading-[1.18]">
-            O teu curso começa aqui —{' '}
-            <span className="bg-gradient-to-r from-cyan-300 via-sky-200 to-teal-200 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(34,211,238,0.35)]">
-              com ajuda de quem já passou.
-            </span>
-          </h2>
-
-          <p className="mt-4 text-sm leading-relaxed text-brand-100/85 sm:text-base">
-            Entra com o teu email institucional e explora centenas de materiais
-            partilhados pela comunidade de Engenharia Informática da UAlg.
-          </p>
-
-          <div className="mt-8 space-y-3.5">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className={`group flex items-start gap-4 rounded-2xl border ${feature.borderColor} ${feature.bgColor} ${feature.shadowColor} p-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5`}
-              >
-                <div
-                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${feature.iconBorder} transition-transform duration-300 group-hover:scale-105`}
-                >
-                  {feature.icon}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-sm font-semibold tracking-tight text-white">
-                      {feature.title}
-                    </h3>
-                    <span
-                      className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${feature.tagStyle}`}
-                    >
-                      {feature.tag}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs leading-relaxed text-brand-100/80">
-                    {feature.description}
+            {step === 'email' ? (
+              <>
+                <div className="mb-8">
+                  <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
+                    Bem-vindo de volta
+                  </h1>
+                  <p className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">
+                    Insere o teu email institucional para receberes um código de
+                    acesso.
                   </p>
                 </div>
-              </div>
-            ))}
-          </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-2.5 pt-1">
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/50 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-200 shadow-[0_0_12px_rgba(52,211,153,0.2)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
-              100% Gratuito
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-sky-400/50 bg-sky-500/15 px-3 py-1.5 text-xs font-semibold text-sky-200 shadow-[0_0_12px_rgba(56,189,248,0.2)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_6px_#38bdf8]" />
-              Exclusivo UAlg
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/50 bg-cyan-500/15 px-3 py-1.5 text-xs font-semibold text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,0.2)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]" />
-              Feito por Estudantes
-            </span>
-          </div>
-        </div>
-
-        {/* Rodapé do painel */}
-        <div className="relative flex items-center justify-between border-t border-cyan-400/20 pt-5 text-xs text-brand-200/70">
-          <span>
-            © {new Date().getFullYear()} NEEI · Universidade do Algarve
-          </span>
-          <span className="hidden xl:inline text-cyan-300/80 font-medium">
-            Licenciatura
-          </span>
-        </div>
-      </div>
-
-      {/* Formulário */}
-      <div className="flex items-center justify-center bg-zinc-50 px-4 py-12 dark:bg-night-950">
-        <div className="w-full max-w-md">
-          <div className="mb-8 flex items-center gap-3 lg:hidden">
-            <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl ring-1 ring-zinc-900/10 dark:ring-white/10">
-              <Image
-                src="/neei-logo.png"
-                alt=""
-                width={40}
-                height={40}
-                className="h-full w-full object-cover"
-              />
-            </span>
-            <span className="text-base font-bold tracking-tight text-zinc-900 dark:text-white">
-              NEEI-Box
-            </span>
-          </div>
-
-          {step === 'email' ? (
-            <>
-              <div className="mb-8">
-                <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
-                  Bem-vindo de volta
-                </h1>
-                <p className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">
-                  Insere o teu email institucional para receberes um código de
-                  acesso.
-                </p>
-              </div>
-
-              <form onSubmit={sendCode} className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor="email"
-                    className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
-                  >
-                    Endereço de email
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    autoComplete="email"
-                    placeholder="a12345@ualg.pt"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="h-11 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm text-zinc-900 outline-none transition-shadow placeholder:text-zinc-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-night-900 dark:text-white dark:focus:border-brand-400"
-                  />
-                </div>
-
-                {errorMsg && (
-                  <div
-                    role="alert"
-                    className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
-                  >
-                    {errorMsg}
+                <form onSubmit={sendCode} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label
+                      htmlFor="email"
+                      className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
+                    >
+                      Endereço de email
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      required
+                      autoComplete="email"
+                      placeholder="a12345@ualg.pt"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="h-11 w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm text-zinc-900 outline-none transition-shadow placeholder:text-zinc-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-night-900 dark:text-white dark:focus:border-brand-400"
+                    />
                   </div>
-                )}
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="mt-1 flex h-11 w-full items-center justify-center rounded-xl bg-brand-900 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-800 disabled:opacity-60 dark:bg-brand-500 dark:text-night-950 dark:hover:bg-brand-400"
-                >
-                  {loading ? 'A enviar...' : 'Enviar código de acesso'}
-                </button>
-              </form>
+                  {errorMsg && (
+                    <div
+                      role="alert"
+                      className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
+                    >
+                      {errorMsg}
+                    </div>
+                  )}
 
-              <p className="mt-6 text-center text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-                Só aceitamos emails institucionais da{' '}
-                <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                  Universidade do Algarve
-                </span>
-                . Não tens conta? Cria-a automaticamente com o mesmo email.
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="mb-8">
-                <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
-                  Verifica o teu email
-                </h1>
-                <p className="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                  Enviámos um código de acesso para{' '}
-                  <span className="font-semibold text-zinc-900 dark:text-white">
-                    {email}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="mt-1 flex h-11 w-full items-center justify-center rounded-xl bg-brand-900 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-800 disabled:opacity-60 dark:bg-brand-500 dark:text-night-950 dark:hover:bg-brand-400"
+                  >
+                    {loading ? 'A enviar...' : 'Enviar código de acesso'}
+                  </button>
+                </form>
+
+                <p className="mt-6 text-center text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+                  Só aceitamos emails institucionais da{' '}
+                  <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                    Universidade do Algarve
                   </span>
-                  .
+                  . Não tens conta? Cria-a automaticamente com o mesmo email.
                 </p>
-              </div>
-
-              <form onSubmit={verifyCode} className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label
-                    htmlFor="token"
-                    className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
-                  >
-                    Código de acesso
-                  </label>
-                  <input
-                    id="token"
-                    type="text"
-                    required
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    maxLength={10}
-                    placeholder="00000000"
-                    value={token}
-                    onChange={(e) =>
-                      setToken(e.target.value.replace(/\D/g, '').slice(0, 10))
-                    }
-                    className="h-11 w-full rounded-xl border border-zinc-300 bg-white px-4 text-center text-lg font-semibold tracking-[0.35em] text-zinc-900 outline-none transition-shadow placeholder:text-zinc-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-night-900 dark:text-white dark:placeholder:text-zinc-600 dark:focus:border-brand-400"
-                  />
+              </>
+            ) : (
+              <>
+                <div className="mb-8">
+                  <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
+                    Verifica o teu email
+                  </h1>
+                  <p className="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                    Enviámos um código de acesso para{' '}
+                    <span className="font-semibold text-zinc-900 dark:text-white">
+                      {email}
+                    </span>
+                    .
+                  </p>
                 </div>
 
-                {errorMsg && (
-                  <div
-                    role="alert"
-                    className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
-                  >
-                    {errorMsg}
+                <form onSubmit={verifyCode} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label
+                      htmlFor="token"
+                      className="text-xs font-medium text-zinc-700 dark:text-zinc-300"
+                    >
+                      Código de acesso
+                    </label>
+                    <input
+                      id="token"
+                      type="text"
+                      required
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={10}
+                      placeholder="00000000"
+                      value={token}
+                      onChange={(e) =>
+                        setToken(e.target.value.replace(/\D/g, '').slice(0, 10))
+                      }
+                      className="h-11 w-full rounded-xl border border-zinc-300 bg-white px-4 text-center text-lg font-semibold tracking-[0.35em] text-zinc-900 outline-none transition-shadow placeholder:text-zinc-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-white/10 dark:bg-night-900 dark:text-white dark:placeholder:text-zinc-600 dark:focus:border-brand-400"
+                    />
                   </div>
-                )}
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="mt-1 flex h-11 w-full items-center justify-center rounded-xl bg-brand-900 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-800 disabled:opacity-60 dark:bg-brand-500 dark:text-night-950 dark:hover:bg-brand-400"
-                >
-                  {loading ? 'A verificar...' : 'Entrar'}
-                </button>
-              </form>
+                  {errorMsg && (
+                    <div
+                      role="alert"
+                      className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400"
+                    >
+                      {errorMsg}
+                    </div>
+                  )}
 
-              <div className="mt-6 flex items-center justify-center gap-4 text-xs font-medium">
-                <button
-                  onClick={() => {
-                    setStep('email');
-                    setErrorMsg('');
-                  }}
-                  className="text-zinc-500 underline underline-offset-2 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="mt-1 flex h-11 w-full items-center justify-center rounded-xl bg-brand-900 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-800 disabled:opacity-60 dark:bg-brand-500 dark:text-night-950 dark:hover:bg-brand-400"
+                  >
+                    {loading ? 'A verificar...' : 'Entrar'}
+                  </button>
+                </form>
+
+                <div className="mt-6 flex items-center justify-center gap-4 text-xs font-medium">
+                  <button
+                    onClick={() => {
+                      setStep('email');
+                      setErrorMsg('');
+                    }}
+                    className="text-zinc-500 underline underline-offset-2 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                  >
+                    Utilizar outro email
+                  </button>
+                  <span className="text-zinc-300 dark:text-zinc-700">·</span>
+                  <button
+                    onClick={sendCode}
+                    disabled={loading}
+                    className="text-brand-700 underline underline-offset-2 hover:text-brand-600 dark:text-brand-300 dark:hover:text-brand-200"
+                  >
+                    Reenviar código
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Painel de destaque na direita (col-span-7) */}
+        <div className="relative hidden overflow-hidden rounded-3xl border border-brand-200/50 bg-gradient-to-br from-brand-900 via-brand-950 to-[#072535] p-8 shadow-2xl shadow-brand-950/20 lg:flex lg:col-span-7 lg:flex-col lg:justify-between xl:p-12 dark:border-cyan-500/20">
+          {/* Padrão subtil de pontos em tom ciano */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(100,189,226,0.14)_1px,transparent_0)] [background-size:24px_24px]"
+          />
+
+          {/* Efeitos de iluminação ambiente com cores vibrantes */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -left-16 -top-16 h-[380px] w-[380px] rounded-full bg-cyan-400/20 blur-[100px]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-20 -right-16 h-[400px] w-[400px] rounded-full bg-sky-500/25 blur-[100px]"
+          />
+
+          {/* Cabeçalho do painel com outline luminosa */}
+          <div className="relative">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/50 bg-gradient-to-r from-cyan-500/20 via-sky-500/15 to-brand-500/10 px-3.5 py-1.5 text-xs font-semibold text-cyan-200 shadow-[0_0_20px_rgba(34,211,238,0.25)] ring-1 ring-cyan-400/20 backdrop-blur-md">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
+              </span>
+              Repositório Académico · NEEI UAlg
+            </div>
+          </div>
+
+          {/* Conteúdo central */}
+          <div className="relative my-auto py-6">
+            <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl xl:text-[2.65rem] xl:leading-[1.18]">
+              O teu curso começa aqui —{' '}
+              <span className="bg-gradient-to-r from-cyan-300 via-sky-200 to-teal-200 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(34,211,238,0.35)]">
+                com ajuda de quem já passou.
+              </span>
+            </h2>
+
+            <p className="mt-4 text-sm leading-relaxed text-brand-100/85 sm:text-base">
+              Entra com o teu email institucional e explora centenas de materiais
+              partilhados pela comunidade de Engenharia Informática da UAlg.
+            </p>
+
+            <div className="mt-7 space-y-3">
+              {features.map((feature) => (
+                <div
+                  key={feature.title}
+                  className={`group flex items-start gap-4 rounded-2xl border ${feature.borderColor} ${feature.bgColor} ${feature.shadowColor} p-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5`}
                 >
-                  Utilizar outro email
-                </button>
-                <span className="text-zinc-300 dark:text-zinc-700">·</span>
-                <button
-                  onClick={sendCode}
-                  disabled={loading}
-                  className="text-brand-700 underline underline-offset-2 hover:text-brand-600 dark:text-brand-300 dark:hover:text-brand-200"
-                >
-                  Reenviar código
-                </button>
-              </div>
-            </>
-          )}
+                  <div
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${feature.iconBorder} transition-transform duration-300 group-hover:scale-105`}
+                  >
+                    {feature.icon}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <h3 className="text-sm font-semibold tracking-tight text-white">
+                        {feature.title}
+                      </h3>
+                      <span
+                        className={`shrink-0 rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${feature.tagStyle}`}
+                      >
+                        {feature.tag}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs leading-relaxed text-brand-100/80">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center gap-2.5 pt-1">
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-400/50 bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-200 shadow-[0_0_12px_rgba(52,211,153,0.2)]">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
+                100% Gratuito
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-sky-400/50 bg-sky-500/15 px-3 py-1.5 text-xs font-semibold text-sky-200 shadow-[0_0_12px_rgba(56,189,248,0.2)]">
+                <span className="h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_6px_#38bdf8]" />
+                Exclusivo UAlg
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/50 bg-cyan-500/15 px-3 py-1.5 text-xs font-semibold text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,0.2)]">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]" />
+                Feito por Estudantes
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
