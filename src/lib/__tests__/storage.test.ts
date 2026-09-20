@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { existsSync } from 'fs';
 import { Readable } from 'stream';
+import path from 'path';
+
+const uploadPath = (...parts: string[]) => path.resolve('/var/uploads', ...parts);
 
 vi.hoisted(() => {
   process.env.UPLOAD_DIR = '/var/uploads';
@@ -91,11 +94,11 @@ describe('saveFile', () => {
   it('creates the parent directory before writing', async () => {
     await saveFile('user-1/abc.pdf', Buffer.from('data'));
     expect(mocks.mkdir).toHaveBeenCalledWith(
-      '/var/uploads/user-1',
+      uploadPath('user-1'),
       expect.any(Object)
     );
     expect(mocks.writeFile).toHaveBeenCalledWith(
-      '/var/uploads/user-1/abc.pdf',
+      uploadPath('user-1/abc.pdf'),
       Buffer.from('data')
     );
   });
@@ -121,7 +124,7 @@ describe('saveFile', () => {
       saveFile('user-1/subdir/a.pdf', Buffer.from('x'))
     ).resolves.toBeDefined();
     expect(mocks.writeFile).toHaveBeenCalledWith(
-      '/var/uploads/user-1/subdir/a.pdf',
+      uploadPath('user-1/subdir/a.pdf'),
       Buffer.from('x')
     );
   });
@@ -138,7 +141,7 @@ describe('deleteFile', () => {
 
     const result = await deleteFile('a.pdf');
     expect(result).toBe(true);
-    expect(mocks.unlink).toHaveBeenCalledWith('/var/uploads/a.pdf');
+    expect(mocks.unlink).toHaveBeenCalledWith(uploadPath('a.pdf'));
   });
 
   it('returns false without deleting when the file does not exist', async () => {
@@ -172,7 +175,7 @@ describe('getFileStats', () => {
 
     const stats = await getFileStats('a.pdf');
     expect(stats).toEqual({
-      fullPath: '/var/uploads/a.pdf',
+      fullPath: uploadPath('a.pdf'),
       size: 1234,
       mtime,
     });
@@ -266,9 +269,11 @@ describe('saveFileStream', () => {
     expect(result.webUrl).toBe('/api/files/user-1/abc.pdf');
     expect(mocks.rename).toHaveBeenCalledWith(
       expect.stringMatching(
-        /^\/var\/uploads\/user-1\/abc\.pdf\.[0-9a-f]+\.tmp$/
+        new RegExp(
+          `^${uploadPath('user-1/abc.pdf').replace(/\\/g, '\\\\')}\\.[0-9a-f]+\\.tmp$`
+        )
       ),
-      '/var/uploads/user-1/abc.pdf'
+      uploadPath('user-1/abc.pdf')
     );
   });
 

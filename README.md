@@ -325,9 +325,10 @@ forçar com `npx prisma db push`.
 | `UPLOAD_DIR` | Pasta dos ficheiros (dev: `uploads`) |
 | `MAX_FILE_SIZE_MB` | Tamanho máximo por ficheiro (padrão `50`) |
 | `MAX_STORAGE_LIMIT_GB` | Limite total do armazenamento (padrão `8`) |
-| `SMTP_HOST` / `SMTP_PORT` | Servidor SMTP (padrão `587`) |
-| `SMTP_USER` / `SMTP_PASS` | Credenciais de envio |
-| `SMTP_FROM` | Remetente (padrão `NEEI-Box <no-reply@neei.online>`) |
+| `SMTP_HOST` / `SMTP_PORT` | Servidor SMTP (ex: `smtp.office365.com` / `587`) |
+| `SMTP_USER` / `SMTP_PASS` | Credenciais de envio (ex: `neei@aaualg.pt`) |
+| `SMTP_FROM` | Remetente (padrão `NEEI – AAUAlg <neei@aaualg.pt>`) |
+| `RESEND_API_KEY` / `RESEND_FROM` | (Opcional) Chave da API Resend para envio transacional direto |
 | `ADMIN_EMAILS` | Emails de administradores iniciais, separados por vírgula |
 
 > Em dev, se o SMTP não estiver configurado, o código OTP é impresso no

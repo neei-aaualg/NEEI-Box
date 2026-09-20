@@ -61,12 +61,16 @@ UPLOAD_DIR=/app/uploads
 MAX_FILE_SIZE_MB=50
 MAX_STORAGE_LIMIT_GB=8
 
-# Envio dos códigos OTP
-SMTP_HOST=smtp.exemplo.com
+# Envio dos códigos OTP (Microsoft 365 idêntico ao siteneei)
+SMTP_HOST=smtp.office365.com
 SMTP_PORT=587
-SMTP_USER=seu-email@dominio.com
+SMTP_USER=neei@aaualg.pt
 SMTP_PASS=sua-password-ou-app-token
-SMTP_FROM="NEEI-Box <no-reply@neei.online>"
+SMTP_FROM="NEEI – AAUAlg <neei@aaualg.pt>"
+
+# (Opcional) Resend API para envio transacional direto
+# RESEND_API_KEY=re_...
+# RESEND_FROM="NEEI-Box <no-reply@neei.online>"
 
 # Administradores iniciais (emails separados por vírgula)
 ADMIN_EMAILS="a79994@ualg.pt"
