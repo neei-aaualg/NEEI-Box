@@ -409,8 +409,9 @@ export default function LoginForm() {
             </h2>
 
             <p className="mt-4 text-sm leading-relaxed text-brand-100/85 sm:text-base">
-              Entra com o teu email institucional e explora centenas de materiais
-              partilhados pela comunidade de Engenharia Informática da UAlg.
+              Entra com o teu email institucional e explora centenas de
+              materiais partilhados pela comunidade de Engenharia Informática da
+              UAlg.
             </p>
 
             <div className="mt-7 space-y-3">

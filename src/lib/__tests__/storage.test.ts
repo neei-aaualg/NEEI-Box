@@ -3,7 +3,8 @@ import { existsSync } from 'fs';
 import { Readable } from 'stream';
 import path from 'path';
 
-const uploadPath = (...parts: string[]) => path.resolve('/var/uploads', ...parts);
+const uploadPath = (...parts: string[]) =>
+  path.resolve('/var/uploads', ...parts);
 
 vi.hoisted(() => {
   process.env.UPLOAD_DIR = '/var/uploads';

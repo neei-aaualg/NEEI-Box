@@ -372,19 +372,17 @@ export default function MaterialsManager({
                 role="tab"
                 aria-selected={statusFilter === tab.value}
                 onClick={() => setStatusFilter(tab.value)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  statusFilter === tab.value
+                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${statusFilter === tab.value
                     ? 'bg-brand-900 text-white dark:bg-brand-500 dark:text-night-950'
                     : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-white/5'
-                }`}
+                  }`}
               >
                 {tab.label}
                 <span
-                  className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
-                    statusFilter === tab.value
+                  className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${statusFilter === tab.value
                       ? 'bg-white/20 text-white'
                       : 'bg-zinc-100 text-zinc-500 dark:bg-white/10 dark:text-zinc-400'
-                  }`}
+                    }`}
                 >
                   {counts[tab.value]}
                 </span>
@@ -449,19 +447,17 @@ export default function MaterialsManager({
                 type="button"
                 onClick={() => setSelectedTag(null)}
                 aria-pressed={selectedTag === null}
-                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  selectedTag === null
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${selectedTag === null
                     ? 'bg-brand-900 text-white dark:bg-brand-500 dark:text-night-950'
                     : 'bg-white text-zinc-600 ring-1 ring-zinc-200 hover:bg-zinc-100 dark:bg-night-900 dark:text-zinc-300 dark:ring-white/10 dark:hover:bg-white/5'
-                }`}
+                  }`}
               >
                 Todas
                 <span
-                  className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
-                    selectedTag === null
+                  className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${selectedTag === null
                       ? 'bg-white/20 text-white'
                       : 'bg-zinc-100 text-zinc-500 dark:bg-white/10 dark:text-zinc-400'
-                  }`}
+                    }`}
                 >
                   {statusVisibleMaterials.length}
                 </span>
@@ -476,19 +472,17 @@ export default function MaterialsManager({
                     onClick={() => handleTagSelect(tag.key)}
                     aria-pressed={isSelected}
                     title={`Filtrar por ${tag.label}`}
-                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                      isSelected
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${isSelected
                         ? 'bg-brand-900 text-white dark:bg-brand-500 dark:text-night-950'
                         : 'bg-white text-zinc-600 ring-1 ring-zinc-200 hover:bg-zinc-100 dark:bg-night-900 dark:text-zinc-300 dark:ring-white/10 dark:hover:bg-white/5'
-                    }`}
+                      }`}
                   >
                     {tag.label}
                     <span
-                      className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
-                        isSelected
+                      className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${isSelected
                           ? 'bg-white/20 text-white'
                           : 'bg-zinc-100 text-zinc-500 dark:bg-white/10 dark:text-zinc-400'
-                      }`}
+                        }`}
                     >
                       {tag.count}
                     </span>
@@ -681,11 +675,10 @@ export default function MaterialsManager({
                             type="button"
                             onClick={() => toggleTagSelection(tag.key)}
                             aria-pressed={isSelected}
-                            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                              isSelected
+                            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${isSelected
                                 ? 'bg-brand-900 text-white dark:bg-brand-500 dark:text-night-950'
                                 : 'bg-white text-zinc-600 ring-1 ring-zinc-200 hover:bg-zinc-100 dark:bg-night-900 dark:text-zinc-300 dark:ring-white/10 dark:hover:bg-white/5'
-                            }`}
+                              }`}
                           >
                             {tag.label}
                           </button>
@@ -709,11 +702,10 @@ export default function MaterialsManager({
 
                 <label
                   htmlFor="material-file"
-                  className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors ${
-                    file
+                  className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors ${file
                       ? 'border-brand-300 bg-brand-50/50 dark:border-brand-800 dark:bg-brand-950/30'
                       : 'border-zinc-300 hover:border-brand-400 hover:bg-brand-50/50 dark:border-zinc-700 dark:hover:border-brand-700 dark:hover:bg-brand-950/30'
-                  }`}
+                    }`}
                 >
                   {file ? (
                     <>
@@ -749,7 +741,7 @@ export default function MaterialsManager({
                         Clica para escolher um ficheiro
                       </span>
                       <span className="text-[11px] text-zinc-400">
-                        PDF, DOCX, PPTX, XLSX, ZIP, imagens… (máx. 4 MB)
+                        PDF, DOCX, PPTX, XLSX, ZIP, imagens… (máx. 10 MB)
                       </span>
                     </>
                   )}

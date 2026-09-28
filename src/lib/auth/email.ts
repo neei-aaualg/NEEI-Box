@@ -99,4 +99,3 @@ export async function sendOtpEmail(
 
   return true;
 }
-
